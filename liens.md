@@ -1,0 +1,4 @@
+
+Balancing robots :
+
+bois + moteurs pas à pas ..; https://electricdiylab.com/diy-self-balancing-robot/
