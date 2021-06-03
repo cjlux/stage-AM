@@ -5,11 +5,31 @@ Pièces nécessaires :
 2 moteurs
 2 planches
 1 batterie
-Arduino
-Microprocesseur MPU6050
-Drivers
+Arduino (carte électronique comportant un micro contrôleur. Ce dernier permet de programmer et commander des actionneurs.
+Arduino est donc une interface programmable)
+Microprocesseur 
+Drivers ?
 Circuit imprimé (plaque permettant de relier électriquement un ensemble de composants électroniques entre eux)
 
-Arduino : carte électronique comportant un micro contrôleur. Ce dernier permet de programmer et commander des actionneurs.
-Arduino est donc une interface programmable. 
+Fiches techniques :
 
+1) MPU6050 GY-521
+
+- module compact basé sur la puce MPU-6050 NEMS.
+- combine un gyroscope à 3 axes et un accéléromètre à 3 axes avec un processeur de mouvement numérique (DMP) et un capteur de température.
+- données du capteur sont lues via le Bus I2C, donc besoin que de 2 lignes (SCL et SDA) en plus de l'alimentation électrique. 
+- broche AD0 permet de définir L'Adresse I2C (Low = 0x68,High = 0x69).
+- puce dispose d'un tampon FIFO de 1024 octets, qui peut être lu par exemple via un microcontrôleur. 
+- bus Sub-I2C permet de connecter d'autres capteurs I2C, par exemple pour déterminer la pression atmosphérique, la direction du ciel, etc.
+- grâce au "Digital Motion Processor" (DMP) intégré, des calculs complexes peuvent également être effectués à l'intérieur de la puce pour décharger le microcontrôleur.
+
+2) Moteurs RB-SOY-03
+
+- Moteur Pas-à-Pas unipolaire SOYO SY42STH38-0406A
+- Voltage: 12vdc
+- Résolution de 1.8 degré/pas
+- Couple de 36 oz/pouce
+- Précision de ±5%
+
+Il s'agit d'un moteur pas à pas professionnel et de haute précision.
+Une plus grande précision peut être obtenue en utilisant le mode demi-pas / micro-pas disponibles sur de nombreux contrôleurs de moteurs pas-à-pas.
