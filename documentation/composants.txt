@@ -1,0 +1,15 @@
+Construction du robot
+
+Pièces nécessaires :
+2 roues
+2 moteurs
+2 planches
+1 batterie
+Arduino
+Microprocesseur MPU6050
+Drivers
+Circuit imprimé (plaque permettant de relier électriquement un ensemble de composants électroniques entre eux)
+
+Arduino : carte électronique comportant un micro contrôleur. Ce dernier permet de programmer et commander des actionneurs.
+Arduino est donc une interface programmable. 
+
