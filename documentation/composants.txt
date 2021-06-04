@@ -33,3 +33,11 @@ Fiches techniques :
 
 Il s'agit d'un moteur pas à pas professionnel et de haute précision.
 Une plus grande précision peut être obtenue en utilisant le mode demi-pas / micro-pas disponibles sur de nombreux contrôleurs de moteurs pas-à-pas.
+
+
+Masses des composants :
+- Tige : 25g x 3
+- Planche : 17g x 2 + 18g x 1
+- Moteur : 286g x 2
+- MPU6050 GY-521 : 2g
+- Batteries (les 3 + leur support) : 172g
