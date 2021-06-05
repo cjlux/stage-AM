@@ -8,11 +8,6 @@ Programme Arduino Centrale Inertielle : https://mschoeffler.com/2017/10/05/tutor
 
 * [VertiBot : projet de robot type pendule inversé](https://positron-libre.blog/robots/pendule-inverse-vertibot.php)
 
-
-
-### MPU-6050
-* [Arduino Uno and the InvenSense MPU6050 6DOF IMU](https://42bots.com/tutorials/arduino-uno-and-the-invensense-mpu-6050-6dof-imu/) : mise en oeuvre du Digital Motion Processor (DMP) du MPU-6050
-
 * Cornell University : [Self-balancing Robot](https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/f2015/dc686_nn233_hz263/final_project_webpage_v2/dc686_nn233_hz263/index.html)<br>
 lire dans la partie _Mathematical Background_ les exxplications sur le __complementary filter__ (filtre issu de l'algorithme de fusion des données accéléromètre et gyroscope) dans la partie _Invensense MPU-6050 IMU_ les explications intéressantes sur le MPU 6050<br>
 L'article donne le lien vers https://eu.mouser.com/applications/sensor_solutions_mems/ qui est la source des explications de l'__algo de fusion__ et du __complementary filter__...
@@ -27,6 +22,23 @@ L'article donne le lien vers https://eu.mouser.com/applications/sensor_solutions
 https://github.com/TKJElectronics/KalmanFilter<br>
 https://github.com/TKJElectronics/Example-Sketch-for-IMU-including-Kalman-filter/blob/master/IMU/MPU6050/Kalman.h<br>
 http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
+
+### MPU
+
+* généralités sur les MPU : https://blog.generationrobots.com/fr/imu-et-robotique-ce-quil-faut-connaitre/
+
+
+### MPU-6050
+
+* Doc ARDUINO : MPU-6050 Accelerometer + Gyro https://playground.arduino.cc/Main/MPU-6050/#info<br>
+où l'on trouve cette info : <br>
+  For serious use of the MPU-6050, Jeff Rowberg has done an excellent job.
+  See his I2C lib: http://www.i2cdevlib.com/devices/mpu6050
+  Or the latest code on GitHub: https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050
+
+* [Arduino Uno and the InvenSense MPU6050 6DOF IMU](https://42bots.com/tutorials/arduino-uno-and-the-invensense-mpu-6050-6dof-imu/) : mise en oeuvre du Digital Motion Processor (DMP) du MPU-6050
+
+
 
 ### tutos CoppeliaSim :
 
