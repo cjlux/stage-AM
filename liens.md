@@ -38,6 +38,7 @@ où l'on trouve cette info : <br>
 
 * [Arduino Uno and the InvenSense MPU6050 6DOF IMU](https://42bots.com/tutorials/arduino-uno-and-the-invensense-mpu-6050-6dof-imu/) : mise en oeuvre du Digital Motion Processor (DMP) du MPU-6050
 
+* [Affordable 9 DoF Sensor Fusion]()
 
 
 ### tutos CoppeliaSim :
