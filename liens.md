@@ -6,6 +6,8 @@ Programme Arduino Centrale Inertielle : https://mschoeffler.com/2017/10/05/tutor
 
 * Another Arduino project - Your Arduino Balancing Robot (YABR) - Part 1 : [video](https://www.youtube.com/watch?v=6WWqo-Yr8lA)
 
+* [VertiBot : projet de robot type pendule inversé](https://positron-libre.blog/robots/pendule-inverse-vertibot.php)
+
 
 
 ### MPU-6050
@@ -15,9 +17,9 @@ Programme Arduino Centrale Inertielle : https://mschoeffler.com/2017/10/05/tutor
 lire dans la partie _Mathematical Background_ les exxplications sur le __complementary filter__ (filtre issu de l'algorithme de fusion des données accéléromètre et gyroscope) dans la partie _Invensense MPU-6050 IMU_ les explications intéressantes sur le MPU 6050<br>
 L'article donne le lien vers https://eu.mouser.com/applications/sensor_solutions_mems/ qui est la source des explications de l'__algo de fusion__ et du __complementary filter__...
 
-* des infos intéressantes à lire sur :
-  * comment mesurer l'angle d'un balancing robot avec juste un accéléromètre ou avec un gyroscope et le complentary filter
-  * le principe de l'asservissement de l'équilibre avec un contrôle PID
+  * des infos intéressantes à lire sur :
+    * comment mesurer l'angle d'un balancing robot avec juste un accéléromètre ou avec un gyroscope et le complentary filter
+    * le principe de l'asservissement de l'équilibre avec un contrôle PID
   
  * Dans cet article https://www.instructables.com/Self-Balancing-Robot/ on trouve les deux types de filtres possibles pour intégrer correctement l'angle d'une MPU :
     * __complementatry filter__ : https://bayesianadventures.wordpress.com/2013/10/20/gyroscopes-accelerometers-and-the-complementary-filter/
