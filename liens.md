@@ -36,8 +36,8 @@ où l'on trouve cette info : <br>
   See his I2C lib: http://www.i2cdevlib.com/devices/mpu6050
   Or the latest code on GitHub: https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050
 
-* [Arduino Uno and the InvenSense MPU6050 6DOF IMU](https://42bots.com/tutorials/arduino-uno-and-the-invensense-mpu-6050-6dof-imu/) : mise en oeuvre du Digital Motion Processor (DMP) du MPU-6050
-
+* [Arduino Uno and the InvenSense MPU6050 6DOF IMU](https://42bots.com/tutorials/arduino-uno-and-the-invensense-mpu-6050-6dof-imu/) : mise en oeuvre du Digital Motion Processor (DMP) du MPU-6050<br>
+__notes JLC__ ce tuto montre comment calibrer et utiliser un MPU6050 : on peut suivre leur protocole, ça marche, sauf qu'il faut utiliser les bibilothèques __MPU6050.zip__ et __I2Cdev.zip__  "à jour" sur https://github.com/jrowberg/i2cdevlib et que j'ai mises en ligne ici.
 
 ### tutos CoppeliaSim :
 
