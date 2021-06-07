@@ -41,3 +41,12 @@ Masses des composants :
 - Moteur : 286g x 2
 - MPU6050 GY-521 : 2g
 - Batteries (les 3 + leur support) : 172g
+
+3) Driver Moteur POLOLU MD09B
+
+ Ce pilote de moteur pas à pas vous permet de contrôler un moteur pas à pas bipolaire avec un courant de sortie jusqu'à 2 A par bobine (voir la section Considérations sur la dissipation de puissance ci-dessous pour plus d'informations). Voici quelques-unes des principales caractéristiques du pilote :
+- Interface de contrôle de pas et de direction simple
+- Cinq résolutions de pas différentes : pas complet, demi-pas, quart de pas, huitième pas et seizième pas
+- Le contrôle de courant réglable vous permet de régler la sortie de courant maximale avec un potentiomètre, ce qui vous permet d'utiliser des tensions supérieures à la tension nominale de votre moteur pas à pas pour atteindre des taux de pas plus élevés
+- Commande de hachage intelligente qui sélectionne automatiquement le mode de décroissance actuel correct (décroissance rapide ou décroissance lente)
+- Arrêt thermique en cas de surchauffe, verrouillage de sous-tension et protection contre les courants croisés
