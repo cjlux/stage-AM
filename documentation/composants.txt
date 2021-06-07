@@ -8,7 +8,7 @@ Pièces nécessaires :
 Arduino (carte électronique comportant un micro contrôleur. Ce dernier permet de programmer et commander des actionneurs.
 Arduino est donc une interface programmable)
 Microprocesseur 
-Drivers ?
+Drivers POLOLU MD09B
 Circuit imprimé (plaque permettant de relier électriquement un ensemble de composants électroniques entre eux)
 
 Fiches techniques :

@@ -8,3 +8,5 @@ API Python
 Langage de programmation C++
 - Construction du robot (récupération des composants, découpe, etc)
 - Participation à la soutenance de l'équipe ENSAM 2020-2021 responsable de la poursuite du projet Mini-Apterros
+- Modélisation du robot avec les bonnes dimensions et les textures
+- Programme Arduino de la centrale inertielle pour récupérer les angles de rotation (utiliser algorithme fusion)
