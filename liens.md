@@ -4,6 +4,8 @@
 * bois + moteurs pas à pas + MPU-6050 : https://electricdiylab.com/diy-self-balancing-robot/
 Programme Arduino Centrale Inertielle : https://mschoeffler.com/2017/10/05/tutorial-how-to-use-the-gy-521-module-mpu-6050-breakout-board-with-the-arduino-uno/
 
+* projet robot a deux roues B-Robot : http://cienciaycacharreo.blogspot.com/2013/10/b-robot-un-robot-equilibrista-impreso_28.html
+
 * Another Arduino project - Your Arduino Balancing Robot (YABR) - Part 1 : [video](https://www.youtube.com/watch?v=6WWqo-Yr8lA)
 
 * [VertiBot : projet de robot type pendule inversé](https://positron-libre.blog/robots/pendule-inverse-vertibot.php)
