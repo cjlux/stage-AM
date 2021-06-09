@@ -10,3 +10,4 @@ Langage de programmation C++
 - Participation à la soutenance de l'équipe ENSAM 2020-2021 responsable de la poursuite du projet Mini-Apterros
 - Modélisation du robot avec les bonnes dimensions et les textures
 - Programme Arduino de la centrale inertielle pour récupérer les angles de rotation (utiliser algorithme fusion)
+- Prise en main du pilotage des moteurs pas à pas avec l'Arduino
