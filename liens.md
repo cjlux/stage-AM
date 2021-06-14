@@ -25,6 +25,8 @@ https://github.com/TKJElectronics/KalmanFilter<br>
 https://github.com/TKJElectronics/Example-Sketch-for-IMU-including-Kalman-filter/blob/master/IMU/MPU6050/Kalman.h<br>
 http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-how-to-implement-it/
 
+How to make self balancing robot : https://www.youtube.com/watch?v=6aMrpmV17mU
+
 ### MPU
 
 * généralités sur les MPU : https://blog.generationrobots.com/fr/imu-et-robotique-ce-quil-faut-connaitre/
