@@ -27,6 +27,8 @@ http://blog.tkjelectronics.dk/2012/09/a-practical-approach-to-kalman-filter-and-
 
 How to make self balancing robot : https://www.youtube.com/watch?v=6aMrpmV17mU
 
+How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
+
 ### MPU
 
 * généralités sur les MPU : https://blog.generationrobots.com/fr/imu-et-robotique-ce-quil-faut-connaitre/
