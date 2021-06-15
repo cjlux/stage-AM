@@ -247,14 +247,14 @@
     /* camera trigger function : activated via Rc Options in the GUI, servo output=A2 on promini */
     // trigger interval can be changed via (*GUI*) or via AUX channel
     //#define CAMTRIG
-    #define CAM_TIME_HIGH 1000   // the duration of HIGH state servo expressed in ms
+    //#define CAM_TIME_HIGH 1000   // the duration of HIGH state servo expressed in ms
 
   /***********************          Airplane                       ***********************/
     //#define USE_THROTTLESERVO // For use of standard 50Hz servo on throttle.
 
     //#define FLAPPERONS    AUX4          // Mix Flaps with Aileroins.
-    #define FLAPPERON_EP   { 1500, 1700 } // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
-    #define FLAPPERON_INVERT { -1, 1 }    // Change direction om flapperons { Wing1, Wing2 }
+    //#define FLAPPERON_EP   { 1500, 1700 } // Endpooints for flaps on a 2 way switch else set {1020,2000} and program in radio.
+    //#define FLAPPERON_INVERT { -1, 1 }    // Change direction om flapperons { Wing1, Wing2 }
     
     //#define FLAPS                       // Traditional Flaps on SERVO3.
     //#define FLAPSPEED     3             // Make flaps move slowm Higher value is Higher Speed.
@@ -273,20 +273,20 @@
 
   /***********************          Heli                           ***********************/
     /* Channel to control CollectivePitch */
-    #define COLLECTIVE_PITCH      THROTTLE
+    //#define COLLECTIVE_PITCH      THROTTLE
 
     /* Limit the range of Collective Pitch. 100% is Full Range each way and position for Zero Pitch */
-    #define COLLECTIVE_RANGE { 80, 0, 80 }// {Min%, ZeroPitch offset from 1500, Max%}.
-    #define YAWMOTOR                 0       // If a motor is used as YAW Set to 1 else set to 0.
+    //#define COLLECTIVE_RANGE { 80, 0, 80 }// {Min%, ZeroPitch offset from 1500, Max%}.
+    //#define YAWMOTOR                 0       // If a motor is used as YAW Set to 1 else set to 0.
 
     /* Servo mixing for heli 120
                          {Coll,Nick,Roll} */
-    #define SERVO_NICK   { +10, -10,  0 }
-    #define SERVO_LEFT   { +10, +5, +10 } 
-    #define SERVO_RIGHT  { +10, +5, -10 } 
+    //#define SERVO_NICK   { +10, -10,  0 }
+    //#define SERVO_LEFT   { +10, +5, +10 } 
+    //#define SERVO_RIGHT  { +10, +5, -10 } 
 
     /* Limit Maximum controll for Roll & Nick  in 0-100% */
-    #define CONTROL_RANGE   { 100, 100 }      //  { ROLL,PITCH }
+    //#define CONTROL_RANGE   { 100, 100 }      //  { ROLL,PITCH }
 
     /* use servo code to drive the throttle output. You want this for analog servo driving the throttle on IC engines.
        if inactive, throttle output will be treated as a motor output, so it can drive an ESC */
@@ -323,7 +323,7 @@
       /* The following lines apply only for specific receiver with only one PPM sum signal, on digital PIN 2
          Select the right line depending on your radio brand. Feel free to modify the order in your PPM order is different */
       //#define SERIAL_SUM_PPM         PITCH,YAW,THROTTLE,ROLL,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Graupner/Spektrum
-      #define SERIAL_SUM_PPM         ROLL,PITCH,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Robe/Hitec/Futaba
+      //#define SERIAL_SUM_PPM         ROLL,PITCH,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Robe/Hitec/Futaba
       //#define SERIAL_SUM_PPM         ROLL,PITCH,YAW,THROTTLE,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For Multiplex
       //#define SERIAL_SUM_PPM         PITCH,ROLL,THROTTLE,YAW,AUX1,AUX2,AUX3,AUX4,8,9,10,11 //For some Hitec/Sanwa/Others
 
@@ -356,7 +356,7 @@
          You have to invert the S-Bus-Serial Signal e.g. with a Hex-Inverter like IC SN74 LS 04 */
       //#define SBUS
       //#define SBUS_SERIAL_PORT 1
-      #define SBUS_MID_OFFSET 988 //SBUS Mid-Point at 1500
+      //#define SBUS_MID_OFFSET 988 //SBUS Mid-Point at 1500
 
 /*************************************************************************************************/
 /*****************                                                                 ***************/
