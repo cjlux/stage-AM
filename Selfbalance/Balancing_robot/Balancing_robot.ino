@@ -13,14 +13,14 @@
 #include <Wire.h>                                            //Include the Wire.h library so we can communicate with the gyro
 
 int gyro_address = 0x68;                                     //MPU-6050 I2C address (0x68 or 0x69)
-int acc_calibration_value = 75;                       //Enter the accelerometer calibration value
+int acc_calibration_value = -10;                            //Enter the accelerometer calibration value
 
 //Various settings
-float pid_p_gain = 15 ;                                       //Gain setting for the P-controller (15)
+float pid_p_gain = 58;                                       //Gain setting for the P-controller (+58 T bon)
 float pid_i_gain = 1.5;                                      //Gain setting for the I-controller (1.5)
-float pid_d_gain = 30;                                       //Gain setting for the D-controller (30)
-float turning_speed = 20;                                    //Turning speed (20)
-float max_target_speed = 100;                                //Max target speed (100)
+float pid_d_gain = 1;                                       //Gain setting for the D-controller (1)
+float turning_speed = 30;                                    //Turning speed (30)
+float max_target_speed = 150;                                //Max target speed (150)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declaring global variables
@@ -79,10 +79,10 @@ void setup(){
   Wire.write(0x03);                                                         //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
   Wire.endTransmission();                                                   //End the transmission with the gyro 
 
-  pinMode(3, OUTPUT);                                                       //Configure digital poort 2 as output
-  pinMode(4, OUTPUT);                                                       //Configure digital poort 3 as output
-  pinMode(5, OUTPUT);                                                       //Configure digital poort 4 as output
-  pinMode(6, OUTPUT);                                                       //Configure digital poort 5 as output
+  pinMode(2, OUTPUT);                                                       //Configure digital poort 2 as output
+  pinMode(3, OUTPUT);                                                       //Configure digital poort 3 as output
+  pinMode(4, OUTPUT);                                                       //Configure digital poort 4 as output
+  pinMode(5, OUTPUT);                                                       //Configure digital poort 5 as output
   pinMode(13, OUTPUT);                                                      //Configure digital poort 6 as output
 
   for(receive_counter = 0; receive_counter < 500; receive_counter++){       //Create 500 loops
@@ -120,12 +120,12 @@ void loop(){
   //12.5V equals 1023 analogRead(0).
   //1250 / 1023 = 1.222.
   //The variable battery_voltage holds 1050 if the battery voltage is 10.5V.
-  //battery_voltage = (analogRead(0) * 1.222) + 85;
+  battery_voltage = (analogRead(0) * 1.222) + 85;
   
-  //if(battery_voltage < 1050 && battery_voltage > 800){                      //If batteryvoltage is below 10.5V and higher than 8.0V
-  //  digitalWrite(13, HIGH);                                                 //Turn on the led if battery voltage is to low
-  // low_bat = 1;                                                            //Set the low_bat variable to 1
- // }
+  if(battery_voltage < 1050 && battery_voltage > 800){                      //If batteryvoltage is below 10.5V and higher than 8.0V
+    digitalWrite(13, HIGH);                                                 //Turn on the led if battery voltage is to low
+    low_bat = 1;                                                            //Set the low_bat variable to 1
+  }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //Angle calculations
@@ -170,6 +170,10 @@ void loop(){
 
   angle_gyro = angle_gyro * 0.9996 + angle_acc * 0.0004;                    //Correct the drift of the gyro angle with the accelerometer angle
 
+
+
+  Serial.print("Angle : ");
+  Serial.println(angle_gyro);
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //PID controller calculations
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,13 +280,13 @@ ISR(TIMER2_COMPA_vect){
     throttle_counter_left_motor = 0;                                        //Reset the throttle_counter_left_motor variable
     throttle_left_motor_memory = throttle_left_motor;                       //Load the next throttle_left_motor variable
     if(throttle_left_motor_memory < 0){                                     //If the throttle_left_motor_memory is negative
-      PORTD &= 0b00100000;                                                  //Set output 5 low to reverse the direction of the stepper controller
+      PORTD &= 0b11110111;                                                  //Set output 3 low to reverse the direction of the stepper controller
       throttle_left_motor_memory *= -1;                                     //Invert the throttle_left_motor_memory variable
     }
-    else PORTD |= 0b11011111;                                               //Set output 5 high for a forward direction of the stepper motor
+    else PORTD |= 0b00001000;                                               //Set output 3 high for a forward direction of the stepper motor
   }
-  else if(throttle_counter_left_motor == 1)PORTD |= 0b01000000;             //Set output 6 high to create a pulse for the stepper controller
-  else if(throttle_counter_left_motor == 2)PORTD &= 0b10111111;             //Set output 6 low because the pulse only has to last for 20us 
+  else if(throttle_counter_left_motor == 1)PORTD |= 0b00000100;             //Set output 2 high to create a pulse for the stepper controller
+  else if(throttle_counter_left_motor == 2)PORTD &= 0b11111011;             //Set output 2 low because the pulse only has to last for 20us 
   
   //right motor pulse calculations
   throttle_counter_right_motor ++;                                          //Increase the throttle_counter_right_motor variable by 1 every time the routine is executed
@@ -290,10 +294,10 @@ ISR(TIMER2_COMPA_vect){
     throttle_counter_right_motor = 0;                                       //Reset the throttle_counter_right_motor variable
     throttle_right_motor_memory = throttle_right_motor;                     //Load the next throttle_right_motor variable
     if(throttle_right_motor_memory < 0){                                    //If the throttle_right_motor_memory is negative
-      PORTD |= 0b11110111;                                                   //Set output 3 low to reverse the direction of the stepper controller
+      PORTD |= 0b00100000;                                                  //Set output 5 low to reverse the direction of the stepper controller
       throttle_right_motor_memory *= -1;                                    //Invert the throttle_right_motor_memory variable
     }
-    else PORTD &= 0b00001000;                                               //Set output 3 high for a forward direction of the stepper motor
+    else PORTD &= 0b11011111;                                               //Set output 5 high for a forward direction of the stepper motor
   }
   else if(throttle_counter_right_motor == 1)PORTD |= 0b00010000;            //Set output 4 high to create a pulse for the stepper controller
   else if(throttle_counter_right_motor == 2)PORTD &= 0b11101111;            //Set output 4 low because the pulse only has to last for 20us
