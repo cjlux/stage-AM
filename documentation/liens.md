@@ -1,3 +1,8 @@
+### LIENS IMPORTANTS :
+
+Projet Self Balancing Robot utilisé : http://www.brokking.net/yabr_main.html
+
+How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
 
 ### Balancing robots :
 
