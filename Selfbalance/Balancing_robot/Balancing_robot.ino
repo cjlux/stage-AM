@@ -12,6 +12,13 @@
 
 #include <Wire.h>                                            //Include the Wire.h library so we can communicate with the gyro
 
+
+#define PIN_DIR_R 5                                          // Pin number of the 'DIR' port of the right stepper motor
+#define PIN_STEP_R 2                                         // Pin number of the 'Step' port of the right stepper motor
+#define PIN_DIR_L 3                                          // Pin number of the 'DIR' port of the left stepper motor
+#define PIN_STEP_L 4                                         // Pin number of the 'STEP' port of the left stepper motor
+
+
 int gyro_address = 0x68;                                     //MPU-6050 I2C address (0x68 or 0x69)
 int acc_calibration_value = -10;                            //Enter the accelerometer calibration value
 
@@ -21,6 +28,11 @@ float pid_i_gain = 1.5;                                      //Gain setting for 
 float pid_d_gain = 1;                                       //Gain setting for the D-controller (1)
 float turning_speed = 30;                                    //Turning speed (30)
 float max_target_speed = 150;                                //Max target speed (150)
+
+
+// functions to Set and clear PINS
+#define CLR(x,y) (x &= (~(1 << y)))
+#define SET(x,y) (x |= (1 << y))
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Declaring global variables
@@ -79,12 +91,18 @@ void setup(){
   Wire.write(0x03);                                                         //Set the register bits as 00000011 (Set Digital Low Pass Filter to ~43Hz)
   Wire.endTransmission();                                                   //End the transmission with the gyro 
 
-  pinMode(2, OUTPUT);                                                       //Configure digital poort 2 as output
+  /*pinMode(2, OUTPUT);                                                       //Configure digital poort 2 as output
   pinMode(3, OUTPUT);                                                       //Configure digital poort 3 as output
   pinMode(4, OUTPUT);                                                       //Configure digital poort 4 as output
   pinMode(5, OUTPUT);                                                       //Configure digital poort 5 as output
   pinMode(13, OUTPUT);                                                      //Configure digital poort 6 as output
-
+*/
+  pinMode(PIN_STEP_R, OUTPUT);                                                       //Configure digital poort 2 as output
+  pinMode(PIN_DIR_L, OUTPUT);                                                       //Configure digital poort 3 as output
+  pinMode(PIN_STEP_L, OUTPUT);                                                       //Configure digital poort 4 as output
+  pinMode(PIN_DIR_R, OUTPUT);                                                       //Configure digital poort 5 as output
+  pinMode(13, OUTPUT);                                                      //Configure digital poort 6 as output
+  
   for(receive_counter = 0; receive_counter < 500; receive_counter++){       //Create 500 loops
     if(receive_counter % 15 == 0)digitalWrite(13, !digitalRead(13));        //Change the state of the LED every 15 loops to make the LED blink fast
     Wire.beginTransmission(gyro_address);                                   //Start communication with the gyro
@@ -280,13 +298,17 @@ ISR(TIMER2_COMPA_vect){
     throttle_counter_left_motor = 0;                                        //Reset the throttle_counter_left_motor variable
     throttle_left_motor_memory = throttle_left_motor;                       //Load the next throttle_left_motor variable
     if(throttle_left_motor_memory < 0){                                     //If the throttle_left_motor_memory is negative
-      PORTD &= 0b11110111;                                                  //Set output 3 low to reverse the direction of the stepper controller
+      //PORTD &= 0b11110111;                                                  //Set output 3 low to reverse the direction of the stepper controller
+      CLR(PORTD,PIN_DIR_L);
       throttle_left_motor_memory *= -1;                                     //Invert the throttle_left_motor_memory variable
     }
-    else PORTD |= 0b00001000;                                               //Set output 3 high for a forward direction of the stepper motor
+    //else PORTD |= 0b00001000;                                               //Set output 3 high for a forward direction of the stepper motor
+    else SET(PORTD,PIN_DIR_L);
   }
-  else if(throttle_counter_left_motor == 1)PORTD |= 0b00000100;             //Set output 2 high to create a pulse for the stepper controller
-  else if(throttle_counter_left_motor == 2)PORTD &= 0b11111011;             //Set output 2 low because the pulse only has to last for 20us 
+  //else if(throttle_counter_left_motor == 1)PORTD |= 0b00000100;             //Set output 2 high to create a pulse for the stepper controller
+  else if(throttle_counter_left_motor == 1)SET(PORTD,PIN_STEP_R);
+  //else if(throttle_counter_left_motor == 2)PORTD &= 0b11111011;             //Set output 2 low because the pulse only has to last for 20us 
+  else if(throttle_counter_left_motor == 2)CLR(PORTD,PIN_STEP_R);
   
   //right motor pulse calculations
   throttle_counter_right_motor ++;                                          //Increase the throttle_counter_right_motor variable by 1 every time the routine is executed
@@ -294,11 +316,15 @@ ISR(TIMER2_COMPA_vect){
     throttle_counter_right_motor = 0;                                       //Reset the throttle_counter_right_motor variable
     throttle_right_motor_memory = throttle_right_motor;                     //Load the next throttle_right_motor variable
     if(throttle_right_motor_memory < 0){                                    //If the throttle_right_motor_memory is negative
-      PORTD |= 0b00100000;                                                  //Set output 5 low to reverse the direction of the stepper controller
+      //PORTD |= 0b00100000;                                                  //Set output 5 low to reverse the direction of the stepper controller
+      SET(PORTD,PIN_DIR_R);
       throttle_right_motor_memory *= -1;                                    //Invert the throttle_right_motor_memory variable
     }
-    else PORTD &= 0b11011111;                                               //Set output 5 high for a forward direction of the stepper motor
+    //else PORTD &= 0b11011111;                                               //Set output 5 high for a forward direction of the stepper motor
+    else CLR(PORTD,PIN_DIR_R);
   }
-  else if(throttle_counter_right_motor == 1)PORTD |= 0b00010000;            //Set output 4 high to create a pulse for the stepper controller
-  else if(throttle_counter_right_motor == 2)PORTD &= 0b11101111;            //Set output 4 low because the pulse only has to last for 20us
+  //else if(throttle_counter_right_motor == 1)PORTD |= 0b00010000;            //Set output 4 high to create a pulse for the stepper controller
+  else if(throttle_counter_right_motor == 1)SET(PORTD,PIN_STEP_L); 
+  //else if(throttle_counter_right_motor == 2)PORTD &= 0b11101111;            //Set output 4 low because the pulse only has to last for 20us
+  else if(throttle_counter_right_motor == 2)CLR(PORTD,PIN_STEP_L);
 }
