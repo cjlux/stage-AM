@@ -11,3 +11,5 @@ Langage de programmation C++
 - Modélisation du robot avec les bonnes dimensions et les textures
 - Programme Arduino de la centrale inertielle pour récupérer les angles de rotation (utiliser algorithme fusion)
 - Prise en main du pilotage des moteurs pas à pas avec l'Arduino
+
+https://www.overleaf.com/3341389681kswhrkrktqky
