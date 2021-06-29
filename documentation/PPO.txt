@@ -1,0 +1,20 @@
+PPO = Proximal Policy Optimization
+
+- PPO est un algorithme sur la politique.
+- PPO peut être utilisé pour des environnements avec des espaces d'action discrets ou continus.
+
+Le découpage sert de régularisateur en supprimant les incitations à changer radicalement de politique, 
+et l'hyperparamètre epsilon correspond à la distance que la nouvelle politique peut s'éloigner de l'ancienne tout en profitant de l'objectif.
+
+Cependant :
+Il est possible de se retrouver avec une nouvelle politique trop éloignée de l'ancienne politique, 
+Solution : l'arrêt précoce. Si la divergence KL moyenne de la nouvelle politique par rapport à l'ancienne dépasse un seuil, 
+nous arrêtons de faire des pas de gradient.
+
+Exploration vs Exploitation :
+PPO = politique stochastique d'une manière conforme à la politique. 
+Cela signifie qu'il explore par échantillonnage des actions selon la dernière version de sa politique stochastique. 
+Le degré d'aléatoire dans la sélection des actions dépend à la fois des conditions initiales et de la procédure d'apprentissage. 
+Au cours de la formation, la politique devient généralement de moins en moins aléatoire, 
+car la règle de mise à jour l'encourage à exploiter les récompenses qu'elle a déjà trouvées. 
+Cela peut entraîner le piégeage de la stratégie dans les optima locaux.
