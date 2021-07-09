@@ -6,6 +6,8 @@ How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
 
 ### Balancing robots :
 
+* these théorie du balancing robot : https://www.diva-portal.org/smash/get/diva2:916184/FULLTEXT01.pdf
+
 * bois + moteurs pas à pas + MPU-6050 : https://electricdiylab.com/diy-self-balancing-robot/
 Programme Arduino Centrale Inertielle : https://mschoeffler.com/2017/10/05/tutorial-how-to-use-the-gy-521-module-mpu-6050-breakout-board-with-the-arduino-uno/
 
