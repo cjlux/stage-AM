@@ -4,6 +4,8 @@ Projet Self Balancing Robot utilisé : http://www.brokking.net/yabr_main.html
 
 How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
 
+How to configure the reward function : https://github.com/cjlux/stage-AM.git
+
 ### Balancing robots :
 
 * these théorie du balancing robot : https://www.diva-portal.org/smash/get/diva2:916184/FULLTEXT01.pdf
