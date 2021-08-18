@@ -4,7 +4,7 @@ Projet Self Balancing Robot utilisé : http://www.brokking.net/yabr_main.html
 
 How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
 
-How to configure the reward function : https://github.com/cjlux/stage-AM.git
+How to configure the reward function : https://medium.com/@BonsaiAI/deep-reinforcement-learning-models-tips-tricks-for-writing-reward-functions-a84fe525e8e0
 
 ### Balancing robots :
 
