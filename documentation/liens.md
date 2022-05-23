@@ -2,6 +2,13 @@
 
 Projet Self Balancing Robot utilisé : http://www.brokking.net/yabr_main.html
 
+vidéo YABR :
+- Part 1 https://youtu.be/6WWqo-Yr8lA
+- part 2 : https://www.youtube.com/watch?v=VxpMWncBKZc
+- Part 3 : https://youtu.be/mG4OtAiY_wU
+
+Les docs : http://www.brokking.net/yabr_downloads.html
+
 How to configure K_p,K_I,K_d : https://www.youtube.com/watch?v=CON0sWNDUco
 
 How to configure the reward function : https://medium.com/@BonsaiAI/deep-reinforcement-learning-models-tips-tricks-for-writing-reward-functions-a84fe525e8e0
