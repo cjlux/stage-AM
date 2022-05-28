@@ -43,7 +43,7 @@ class AduinoReader(object):
         if self.__verbose: print(message, end=end)
 
     def openUSB(self, verbose=False):
-        listUSBports = ["/dev/ttyACM0",  "/dev/ttyACM1",  "/dev/ttyACM2",
+        listUSBports = ["/dev/ttyUSB0", "/dev/ttyACM0",  "/dev/ttyACM1",  "/dev/ttyACM2",
                         "COM1", "COM2", "COM3", "COM4", "COM9", "COM10", "COM13"]
         self.__serialPort = None
         for port in listUSBports:
@@ -155,8 +155,14 @@ class AduinoReader(object):
         plt.savefig(fileName)
         plt.show()
         
-    def readUSB_and_plot(self, max_lines:int, data_cols:tuple, data_labels:tuple, ylim:tuple,
-                         data_tag:str, dt:float, send_tag:str=None, sep:str=None):
+    def readUSB_and_plot(self,
+                         max_lines:int,
+                         data_cols:tuple,
+                         data_labels:tuple,
+                         ylim:tuple,
+                         data_tag:str,
+                         dt:float,
+                         send_tag:str=None, sep:str=None):
         ''' to read lines on the USB link with the ARDUINO, and plot data interactively'''
                    
         if not self.__serialPort.is_open:
