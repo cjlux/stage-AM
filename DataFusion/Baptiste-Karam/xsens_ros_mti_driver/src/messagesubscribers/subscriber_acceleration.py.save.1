@@ -1,0 +1,54 @@
+StampedStamped#!/usr/bin/env python3
+import rospy
+from tf import TransformBroadcaster
+
+from std_msgs.msg import String
+#from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Vector3
+
+class xsens_mti_listener:
+
+    def __init__(self, opened_log_file, verbose=False):
+        self.verbose = verbose
+        self.log_file = opened_log_file
+        self.subscriber = rospy.Subscriber("/imu/acceleration", Vector3, self.callback)
+        self.tfb = TransformBroadcaster()
+        print("instance of xsens_mti_listen created...")
+
+    def callback(self, data):
+        if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+        self.log_file.write(str(data.data)+"\n")
+
+    def parsing(data):
+        fb = data.data.replace("\n?\r?\t", ":") # Replace the \n or \t or \r by : in the str
+        fb = fb.split(":")
+
+        fb_time_sec = fb[5]     # Temps en secondes
+        fb_time_nsec = fb[7]    # Temps en nanosecondes
+
+        fb_data = fb[11:16]     # Récupère les accelerations selon x, y et z
+
+        # Traitement des données
+
+        a_x = float(fb_data[1])
+        a_y = float(fb_data[3])
+        a_z = float(fb_data[5])
+
+        rospy.loginfo("I heard data : %s \n", data.data)
+        rospy.loginfo("I heard x : %f; y : %f; z : %f \n", a_x, a_y, a_z)
+
+if __name__ == '__main__':
+
+   with open("./Data_mti_acceleration.txt", "w") as f:
+
+        listner = xsens_mti_listener(f)
+
+        # In ROS, nodes are uniquely named. If two nodes with the same
+        # name are launched, the previous one is kicked off. The
+        # anonymous=True flag means that rospy will choose a unique
+        # name for our 'listener' node so that multiple listeners can
+        # run simultaneously.
+        rospy.init_node('xsens_mti_listener', anonymous = True)
+
+        # spin() simply keeps python from exiting until this node is stopped
+        rospy.spin()
