@@ -29,6 +29,11 @@
 //  OF ARBITRATION OF THE INTERNATIONAL CHAMBER OF COMMERCE IN THE HAGUE BY ONE OR MORE 
 //  ARBITRATORS APPOINTED IN ACCORDANCE WITH SAID RULES.
 //  
+//
+// Baptiste & Karam -- Internship  ENSEIRB-MATMECA 2022 juin-Steptembre
+//
+// V1.0 - 2022-06-23 Add ros::Rate to impose the lopp frequency
+//
 
 #ifndef IMUPUBLISHER_H
 #define IMUPUBLISHER_H
