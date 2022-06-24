@@ -6,7 +6,9 @@ import rospy
 from std_msgs.msg import String
 
 class iidre_listner:
-    '''This class allow
+    '''This class allows to get the information published by the publisher of IIDRE
+       and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+       registered in the tree where the code is executed.
     '''
     def __init__(self, opened_log_file, duration=None, verbose=False):
         '''Parameters :
@@ -29,8 +31,9 @@ class iidre_listner:
     def callback(self, data):
         '''Verify if the time is up. If it is, it stops the execution, but if not,
            it calls the function parsing to only consider the relevant information
-           of the message. Then, it prints on the terminal the data it hears (when the verbose variable is True).
-           Then, it writes the data in the file.
+           of the message. Then, it writes a message in rospy.loginfo about the data
+           it hears (when the verbose variable is set to True). Then, it writes the
+           data in the file.
         '''
         if self.duration :
         	t = time.time() - self.t0
