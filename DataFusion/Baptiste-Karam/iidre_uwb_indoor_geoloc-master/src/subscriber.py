@@ -6,8 +6,18 @@ import rospy
 from std_msgs.msg import String
 
 class iidre_listner:
-
+    '''This class allow
+    '''
     def __init__(self, opened_log_file, duration=None, verbose=False):
+        '''Parameters :
+                opened_log_file : the file where the data are stored
+                duration : duration of the algorithm's execution
+                verbose : define if there will be messages printed in the terminal
+           Functions :
+           rospy.Subscriber takes in parameters : the topic on which it is registered
+           as a subscriber, the given type of the messages and a function to write what it hears.
+           The current time is also collected to apply the duration you want.
+        '''
         self.verbose = verbose
         self.log_file = opened_log_file
         self.subscriber = rospy.Subscriber("/chatter", String, self.callback)
@@ -17,6 +27,11 @@ class iidre_listner:
         print("instance of iidre_listen created...")
 
     def callback(self, data):
+        '''Verify if the time is up. If it is, it stops the execution, but if not,
+           it calls the function parsing to only consider the relevant information
+           of the message. Then, it prints on the terminal the data it hears (when the verbose variable is True).
+           Then, it writes the data in the file.
+        '''
         if self.duration :
         	t = time.time() - self.t0
         	if t > self.duration :
@@ -26,6 +41,11 @@ class iidre_listner:
         self.log_file.write(str(data.data)+"\n")
 
     def parsing(self, data):
+        '''This enables to only take the relevant information of the message it hears.
+           So, it splits the information at each ':' to first see if the information is about
+           the distance between each anchor and the tag or the position of the tag.
+           Then, it reduces the size of the data to only write in the file the information we want.
+        '''
         fb = data.data.split(":")
         fb_cmd = fb[0]
         fb_data = fb[1].split(",")
@@ -65,17 +85,17 @@ if __name__ == '__main__':
 
    import time, sys
    import argparse
-   
+
    parser = argparse.ArgumentParser()
-   parser.add_argument('--duration', action="store", dest="duration", type=int, 
+   parser.add_argument('--duration', action="store", dest="duration", type=int,
    			help="duration of the experimentation in seconds")
-   
+
    args = parser.parse_args()
    duration = None
    if args.duration :
    	duration = args.duration
    	print("duration : ", duration)
-         
+
    uniq_file_name = f"./Data_iidre_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 
@@ -91,4 +111,4 @@ if __name__ == '__main__':
         rospy.init_node('iidre_listener', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()        
+        rospy.spin()
