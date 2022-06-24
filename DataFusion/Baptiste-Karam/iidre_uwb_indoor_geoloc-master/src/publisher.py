@@ -9,16 +9,16 @@ class UwbXyzPublisher(object):
     def __init__(self):
         '''Parameters: None
            Get parameters from ROS_param:
-           name: 
-           part:str, give the name of the device in /dev, default: "/dev/ttyACM0"
-           frame_id: 
+           name : str, give the name of the device, default: "uwb"
+           port : str, give the name of the device in /dev, default: "/dev/ttyACM0"
+           Initialization of the topic by the Publisher :
+           The name of the topic and the type of messages allowed 
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
         self.serial = None
-        self.topic_name = "chatter"
+        self.topic_name = rospy.Publisher("/chatter", String)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
-        self.publish_anchors = rospy.get_param("publish_anchors", True)
 
     def connect(self):
         '''Try to connect on the serial link. Write messages in rospy.loginfo.
@@ -34,7 +34,7 @@ class UwbXyzPublisher(object):
         rospy.loginfo(f"Connected! Now publishing data from '{self.device_name}'...")
 
     def run(self):
-        '''Impose the data rate (100 Hz) of the loop.
+        '''Impose the data rate (100 Hz here) of the loop.
            Enter in an infinite loop to read a line from serial link,
            pre-process the string and calls the publish method.
         '''
@@ -69,4 +69,3 @@ if __name__ == "__main__":
     node = UwbXyzPublisher()
     node.connect()
     node.run()
-
