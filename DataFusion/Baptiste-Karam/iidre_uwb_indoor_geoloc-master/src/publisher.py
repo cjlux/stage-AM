@@ -4,7 +4,7 @@ import time, serial, rospy
 from std_msgs.msg import String
 
 class UwbXyzPublisher(object):
-    '''This class...
+    '''This class allows to publish the data got by IIDRE on a specific topic.
     '''
     def __init__(self):
         '''Parameters: None
@@ -12,7 +12,7 @@ class UwbXyzPublisher(object):
            name : str, give the name of the device, default: "uwb"
            port : str, give the name of the device in /dev, default: "/dev/ttyACM0"
            Initialization of the topic by the Publisher :
-           The name of the topic and the type of messages allowed 
+           The name of the topic and the type of messages allowed
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
         self.serial = None
