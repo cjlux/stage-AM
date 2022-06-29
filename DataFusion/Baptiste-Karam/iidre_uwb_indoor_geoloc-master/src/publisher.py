@@ -16,7 +16,7 @@ class UwbXyzPublisher(object):
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
         self.serial = None
-        self.topic_name = rospy.Publisher("/chatter", String)
+        self.topic_name = rospy.Publisher('chatter', String, queue_size=10)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
 
@@ -62,8 +62,7 @@ class UwbXyzPublisher(object):
         line=line[:len(line)-4]
 
         #Partie modifiée par nous
-        pub = rospy.Publisher(self.topic_name, String, queue_size=10)
-        pub.publish(line)
+        self.topic_name.publish(line)
 
 if __name__ == "__main__":
     node = UwbXyzPublisher()
