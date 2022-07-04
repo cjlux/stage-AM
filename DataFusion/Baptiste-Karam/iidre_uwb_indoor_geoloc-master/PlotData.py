@@ -73,8 +73,8 @@ if __name__ == '__main__':
     for i in range(nbPoints-1):
         delta.append(data[i+1,1] - data[i,1])   # Concatène la différence entre les données selon X
     delta = np.array(delta, int)                # Cast les données en array
-    moyennes = [ delta.mean() ]                 # Calcule la moyenne de la différence entre les données selon X
-    std = [ 3*delta.std() ]                     # Calcule l'écart-type de la différence entre les données selon X
+    moyennes = [delta.mean()]                   # Calcule la moyenne de la différence entre les données selon X
+    std = [delta.std()]                         # Calcule l'écart-type de la différence entre les données selon X
     nbVar = 3
     for var in range(nbVar-1) :                 # Répète les étapes précédentes selon les autres dimensions
         moyennes.append(data.mean(axis=0)[var+1])
@@ -97,9 +97,9 @@ if __name__ == '__main__':
     axe.set_ylim(0, 300)
     axe.grid(True)
     axe.legend()
-    axe.text(0.1, 0.1,
-            f"Moyenne selon X : {moyennes[1]:.2f} +/- {std[1]:.2f} cm \n"
-            f"Moyenne selon Y : {moyennes[2]:.2f} +/- {std[2]:.2f} cm",
+    axe.text(0, 0,
+            fr"$\bar x$: {moyennes[1]:.2f}, $\sigma$: {std[1]:.2f} cm" "\n"
+            fr"$\bar y$: {moyennes[2]:.2f}, $\sigma$: {std[2]:.2f} cm",
             verticalalignment ='bottom', horizontalalignment ='left')
 
     # Calcul de la moyenne et de la variance pour les distances
@@ -111,8 +111,8 @@ if __name__ == '__main__':
     for i in range(nbPoints-1):
         delta.append(distance["556509AF"][i+1,1] - distance["556509AF"][i,1])   # Concatène la différence entre les distances
     delta = np.array(delta, int)                        # Cast les données en array
-    moyennes = [ delta.mean() ]                         # Calcule la moyenne de la différence entre les distances
-    std = [ 3*delta.std() ]                             # Calcule l'écart-type de la différence entre les ddistances
+    moyennes = [delta.mean()]                           # Calcule la moyenne de la différence entre les distances
+    std = [delta.std()]                                 # Calcule l'écart-type de la différence entre les ddistances
     nbVar = 3
     for (key, val) in enumerate(distance.items()):      # Répète les étapes précédentes pour les autres ancres
         moyennes.append(distance[val[0]][0:nbPoints-1,1].mean(axis=0))
@@ -130,11 +130,13 @@ if __name__ == '__main__':
     axe.set_ylim(100, 350)
     axe.grid(True)
     axe.legend()
-    axe.text(0.1, 75,
-            f"Moyenne selon la première ancre : {moyennes[1]:.2f} +/- {std[1]:.2f} cm \n"
-            f"Moyenne selon la seconde ancre : {moyennes[2]:.2f} +/- {std[2]:.2f} cm \n"
-            f"Moyenne selon la troisième ancre : {moyennes[3]:.2f} +/- {std[3]:.2f} cm \n"
-            f"Moyenne selon la quatrième ancre : {moyennes[4]:.2f} +/- {std[4]:.2f} cm \n",
+    axe.text(0, 110,
+            fr"$\bar x_ 1$: {moyennes[1]:.2f}, $\sigma_ 1$: {std[1]:.2f} cm" "\n"
+            fr"$\bar x_ 2$: {moyennes[2]:.2f}, $\sigma_ 2$: {std[2]:.2f} cm",
+            verticalalignment ='bottom', horizontalalignment ='left')
+    axe.text(20, 110,
+            fr"$\bar x_ 3$: {moyennes[3]:.2f}, $\sigma_ 3$: {std[3]:.2f} cm" "\n"
+            fr"$\bar x_ 4$: {moyennes[4]:.2f}, $\sigma_ 4$: {std[4]:.2f} cm",
             verticalalignment ='bottom', horizontalalignment ='left')
 
     '''
