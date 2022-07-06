@@ -1,11 +1,10 @@
 #
-# Baptiste & Karam - Interniship 2022-06-30 Initial revision ( based on the code of JLC - PlotData.py for IIDRE)
+# Baptiste & Karam - Interniship 2022-07-06 Initial revision ( based on the code of JLC - PlotData.py for IIDRE)
 #
 import time, os, sys
 import numpy as np
 import argparse
-
-
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
@@ -40,44 +39,31 @@ if __name__ == '__main__':
 
     with open(data_file, "r", encoding="utf8") as F:
         for line in F:
-            acc = line.strip()     # clean line with \r,\n... at begin or end
-            if acc.startswith("#"):
+            alt = line.strip()     # clean line with \r,\n... at begin or end
+            if alt.startswith("#"):
                 continue   # skip comment lines
-            x_acc, y_acc, z_acc = map(float, acc.split(',')[:3])
-            data.append([x_acc,y_acc,z_acc])
-
-    # Position définie de manière brute premièrement en attendant d'avoir des valeurs réalistes
-    position = np.ones((len(data),3))
-    for i in range(len(data)) :
-        position[i] = position[i]*i
+            z = float(alt)
+            data.append([z])
 
     data = np.array(data)
 
-    import matplotlib.pyplot as plt
-    from matplotlib import ticker
-
-    X_acc, Y_acc, Z_acc = data[:,0], data[:,1], data[:,2]
-    X_pos, Y_pos, Z_pos = position[:,0], position[:,1], position[:,2]
-
-    from mpl_toolkits.mplot3d import Axes3D
+    Z = data[:,0]
+    Z = Z*1e-1
 
     fig = plt.figure()
     plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
     fig.set_size_inches((11,9))
     fig.suptitle(f"Plot data from file <{data_file}>", fontsize=16)
-    axe = fig.add_subplot(111, projection='3d')
+    axe = fig.add_subplot(111)
 
-    axe.set_ylim(0, 300)
-    axe.set_xlim(0, 300)
-    axe.set_zlim(0, 300)
-    axe.quiver(X_pos, Y_pos, Z_pos, X_acc, Y_acc, Z_acc,color='g')
-    axe.plot(X_pos, Y_pos, Z_pos, markersize=0.2, linestyle=':',linewidth=1, color='m')
-    axe.set_title("Acceleration")
-    axe.set_xlabel("X position [cm]")
-    axe.set_ylabel("Y Position [cm]")
-    axe.set_zlabel("Z Position [cm]")
+
+    axe.set_title("X & Y pos. versus time")
+    axe.plot(np.transpose(np.where(Z)), Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos", linestyle=':')
+    axe.set_xlabel("Time")
+    axe.set_ylabel("Z Position [mm]")
+    axe.set_ylim(0, 150)
     axe.grid(True)
-
+    axe.legend()
 
     #
     plt.savefig(data_file.replace('.txt','.png'))
