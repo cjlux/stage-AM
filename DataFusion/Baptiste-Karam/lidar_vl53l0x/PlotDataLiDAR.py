@@ -9,15 +9,15 @@ import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_file", type=str, default="")
-    parser.add_argument('--stat', action="store_true", dest='stat', default=False,
+    parser.add_argument("--data_file", type=str, default=None,
+                        help="path of the data file")
+    parser.add_argument('--stat', action="store_true",
                          help="wether to compute and plot mean and std")
     args = parser.parse_args()
     stat = args.stat
+    data_file = args.data_file
 
-    data_file = vars(args)["data_file"]
-
-    if data_file == "":
+    if data_file is None:
         while True:
             data_dir = input("Enter the path of the directory to scan for Data files [or Q for quit]... ")
             if data_dir.upper() == "Q": sys.exit()
@@ -47,46 +47,39 @@ if __name__ == '__main__':
             if alt.startswith("#"):
                 continue   # skip comment lines
             z = float(alt)
-            data.append([z])
+            data.append(z)
 
     data = np.array(data)
+    print(data.shape)
 
-    # Calcul de la moyenne et de la variance pour la position
-    nbPoints = len(data)
-    delta = []
-    for i in range(nbPoints-1):
-        delta.append(data[i+1] - data[i])       # Concatène la différence entre les données selon X
-    delta = np.array(delta, int)                # Cast les données en array
-    moyenne = [delta.mean()]                    # Calcule la moyenne de la différence entre les données selon X
-    std = [delta.std()]                         # Calcule l'écart-type de la différence entre les données selon X
-    print(moyenne)
-    print(std)
-    moyenne.append(float(data.mean(axis=0))*1e-1)
-    std.append(float(3*data.std(axis=0))*1e-1)
-
-    Z = data[:,0]
-    Z = Z*1e-1
+    Z = data       # for the moment, data has only one dimension (a single column)
 
     fig = plt.figure()
-    plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
-    fig.set_size_inches((11,9))
-    fig.suptitle(f"Plot data from file <{data_file}>", fontsize=16)
-    axe = fig.add_subplot(111)
+    #plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
+    fig.set_size_inches((8,6))
+    fig.suptitle(f"Data from <{os.path.basename(data_file)}>", fontsize=14)
+    axe = plt.subplot(111)
 
-    axe.set_title("Z pos. versus time")
-    axe.plot(np.transpose(np.where(Z)), Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos")
-    axe.set_xlabel("Time [s]")
-    axe.set_ylabel("Z Position [mm]")
-    axe.set_ylim(0, 150)
+    marker_size = 5 if len(Z) <= 30 else 1
+    axe.set_title("Z (ground distance in the direction of the LiDAR sight)")
+    axe.plot(range(len(Z)), Z, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
+    axe.set_xlabel("JLC : rank -> will be time soon ;-)")
+    axe.set_ylabel("distance [mm]")
+    ymax = 1300
+    axe.set_ylim(0, ymax)
     if stat:
-        print(moyenne)
-        print(std)
-        axe.text(0, 0,
-                fr"$\bar x$: {moyenne[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm",
-                verticalalignment ='bottom', horizontalalignment ='left')
+        z_mean, z_std = Z.mean(), Z.std()
+        z_min, z_max = Z.min(), Z.max()
+        text = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
+        text += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+        print(text)
+        box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
+        axe.text(0, ymax*.98,
+                 fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
+                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm",
+                 va='top', ha ='left', fontsize=9, bbox=box)
     axe.grid(True)
     axe.legend()
-
     #
     plt.savefig(data_file.replace('.txt','.png'))
     plt.show()
