@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Position définie de manière brute premièrement en attendant d'avoir des valeurs réalistes
     position = np.ones((len(data),3))
     for i in range(len(data)) :
-        position[i] = position[i]*i
+        position[i,0] = position[i,0]*2*i
 
     data = np.array(data)
 
