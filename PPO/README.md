@@ -1,4 +1,4 @@
-- Lien sur l'interprétation des tats tensorboard :
+- Lien sur l'interprétation des stats tensorboard :
 
 https://medium.com/aureliantactics/understanding-ppo-plots-in-tensorboard-cbc3199b9ba2
 
