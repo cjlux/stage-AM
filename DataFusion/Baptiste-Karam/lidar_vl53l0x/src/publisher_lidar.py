@@ -2,7 +2,6 @@
 
 import rospy
 from std_msgs.msg import String
-import time
 import VL53L0X
 
 def publisher_lidar():
@@ -13,8 +12,7 @@ def publisher_lidar():
     while not rospy.is_shutdown():
         tof.start_ranging(VL53L0X.VL53L0X_HIGH_SPEED_MODE)
 
-        D = tof.get_distance()
-        pub.publish(str(D))
+        pub.publish(f"{rospy.get_time()},{tof.get_distance()}")
         rate.sleep()
 
 if __name__ == '__main__':
