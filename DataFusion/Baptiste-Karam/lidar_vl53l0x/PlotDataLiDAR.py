@@ -47,6 +47,19 @@ if __name__ == '__main__':
 
     data = np.array(data)
 
+    # Calcul de la moyenne et de la variance pour la position
+    nbPoints = len(data)
+    delta = []
+    for i in range(nbPoints-1):
+        delta.append(data[i+1] - data[i])       # Concatène la différence entre les données selon X
+    delta = np.array(delta, int)                # Cast les données en array
+    moyenne = [delta.mean()]                    # Calcule la moyenne de la différence entre les données selon X
+    std = [delta.std()]                         # Calcule l'écart-type de la différence entre les données selon X
+    print(moyenne)
+    print(std)
+    moyenne.append(float(data.mean(axis=0))*1e-1)
+    std.append(float(3*data.std(axis=0))*1e-1)
+
     Z = data[:,0]
     Z = Z*1e-1
 
@@ -57,11 +70,16 @@ if __name__ == '__main__':
     axe = fig.add_subplot(111)
 
 
-    axe.set_title("X & Y pos. versus time")
-    axe.plot(np.transpose(np.where(Z)), Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos", linestyle=':')
-    axe.set_xlabel("Time")
+    axe.set_title("Z pos. versus time")
+    axe.plot(np.transpose(np.where(Z))*1e-1, Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos")
+    axe.set_xlabel("Time [s]")
     axe.set_ylabel("Z Position [mm]")
     axe.set_ylim(0, 150)
+    print(moyenne)
+    print(std)
+    axe.text(0, 0,
+            fr"$\bar x$: {moyenne[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm",
+            verticalalignment ='bottom', horizontalalignment ='left')
     axe.grid(True)
     axe.legend()
 
