@@ -10,7 +10,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_file", type=str, default="")
+    parser.add_argument('--stat', action="store_true", dest='stat', default=False,
+                         help="wether to compute and plot mean and std")
     args = parser.parse_args()
+    stat = args.stat
+
     data_file = vars(args)["data_file"]
 
     if data_file == "":
@@ -69,17 +73,17 @@ if __name__ == '__main__':
     fig.suptitle(f"Plot data from file <{data_file}>", fontsize=16)
     axe = fig.add_subplot(111)
 
-
     axe.set_title("Z pos. versus time")
     axe.plot(np.transpose(np.where(Z))*1e-1, Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos")
     axe.set_xlabel("Time [s]")
     axe.set_ylabel("Z Position [mm]")
     axe.set_ylim(0, 150)
-    print(moyenne)
-    print(std)
-    axe.text(0, 0,
-            fr"$\bar x$: {moyenne[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm",
-            verticalalignment ='bottom', horizontalalignment ='left')
+    if stat:
+        print(moyenne)
+        print(std)
+        axe.text(0, 0,
+                fr"$\bar x$: {moyenne[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm",
+                verticalalignment ='bottom', horizontalalignment ='left')
     axe.grid(True)
     axe.legend()
 
