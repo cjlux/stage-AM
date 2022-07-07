@@ -74,7 +74,7 @@ if __name__ == '__main__':
     axe = fig.add_subplot(111)
 
     axe.set_title("Z pos. versus time")
-    axe.plot(np.transpose(np.where(Z))*1e-1, Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos")
+    axe.plot(np.transpose(np.where(Z)), Z, markersize=0.2, linewidth=1.5, color='b', label="Z pos")
     axe.set_xlabel("Time [s]")
     axe.set_ylabel("Z Position [mm]")
     axe.set_ylim(0, 150)
