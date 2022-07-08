@@ -41,7 +41,7 @@ if __name__ == '__main__':
     with open(data_file, "r", encoding="utf8") as F:
         for line in F:
             acc = line.strip()     # clean line with \r,\n... at begin or end
-            if line.startswith("#"):
+            if acc.startswith("#"):
                 continue   # skip comment lines
             x_acc, y_acc, z_acc = map(float, acc.split(',')[:3])
             data.append([x_acc,y_acc,z_acc])
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     axe.quiver(X_pos, Y_pos, Z_pos, X_acc, Y_acc, Z_acc,color='g')
     axe.plot(X_pos, Y_pos, Z_pos, markersize=0.2, linestyle=':',linewidth=1, color='m')
     axe.set_title("Acceleration")
-    axe.set_xlabel("X posistion [cm]")
+    axe.set_xlabel("X position [cm]")
     axe.set_ylabel("Y Position [cm]")
     axe.set_zlabel("Z Position [cm]")
     axe.grid(True)
