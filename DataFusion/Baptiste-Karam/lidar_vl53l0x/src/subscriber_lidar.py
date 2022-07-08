@@ -4,7 +4,7 @@ import time, sys
 import rospy
 from std_msgs.msg import String
 
-class LiDAR_listner:
+class LiDAR_listener:
     '''This class allows to get the information published by the publisher of LiDAR
        and stores those data in a file Data_LiDAR__{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
        registered in the tree where the code is executed.
@@ -47,13 +47,13 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        listner = LiDAR_listner(f)
+        listener = LiDAR_listener(f)
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The
         # anonymous=True flag means that rospy will choose a unique
         # name for our 'listener' node so that multiple listeners can
         # run simultaneously.
-        rospy.init_node('LiDAR_listner', anonymous = True)
+        rospy.init_node('LiDAR_listener', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
         rospy.spin()

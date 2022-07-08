@@ -46,13 +46,12 @@ if __name__ == '__main__':
             alt = line.strip()     # clean line with \r,\n... at begin or end
             if alt.startswith("#"):
                 continue   # skip comment lines
-            z = float(alt)
-            data.append(z)
+            t, z = map(float, alt.split(','))
+            data.append([t, z])
 
     data = np.array(data)
-    print(data.shape)
 
-    Z = data       # for the moment, data has only one dimension (a single column)
+    T, Z = data[:,0], data[:,1]
 
     fig = plt.figure()
     #plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
@@ -62,8 +61,8 @@ if __name__ == '__main__':
 
     marker_size = 5 if len(Z) <= 30 else 1
     axe.set_title("Z (ground distance in the direction of the LiDAR sight)")
-    axe.plot(range(len(Z)), Z, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
-    axe.set_xlabel("JLC : rank -> will be time soon ;-)")
+    axe.plot(T, Z, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
+    axe.set_xlabel("time [second]")
     axe.set_ylabel("distance [mm]")
     ymax = 1300
     axe.set_ylim(0, ymax)
