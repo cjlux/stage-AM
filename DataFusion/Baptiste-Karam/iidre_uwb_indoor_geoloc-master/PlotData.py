@@ -98,8 +98,8 @@ if __name__ == '__main__':
     axe.grid(True)
     axe.legend()
     axe.text(0, 0,
-            fr"$\bar x$: {moyennes[1]:.2f}, $\sigma$: {std[1]:.2f} cm" "\n"
-            fr"$\bar y$: {moyennes[2]:.2f}, $\sigma$: {std[2]:.2f} cm",
+            fr"$\bar x$: {moyennes[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm" "\n"
+            fr"$\bar y$: {moyennes[2]:.2f} cm, $\sigma$: {std[2]:.2f} cm",
             verticalalignment ='bottom', horizontalalignment ='left')
 
     # Calcul de la moyenne et de la variance pour les distances
@@ -131,12 +131,12 @@ if __name__ == '__main__':
     axe.grid(True)
     axe.legend()
     axe.text(0, 110,
-            fr"$\bar x_ 1$: {moyennes[1]:.2f}, $\sigma_ 1$: {std[1]:.2f} cm" "\n"
-            fr"$\bar x_ 2$: {moyennes[2]:.2f}, $\sigma_ 2$: {std[2]:.2f} cm",
+            fr"$\bar x_ 1$: {moyennes[1]:.2f} cm, $\sigma_ 1$: {std[1]:.2f} cm" "\n"
+            fr"$\bar x_ 2$: {moyennes[2]:.2f} cm, $\sigma_ 2$: {std[2]:.2f} cm",
             verticalalignment ='bottom', horizontalalignment ='left')
     axe.text(20, 110,
-            fr"$\bar x_ 3$: {moyennes[3]:.2f}, $\sigma_ 3$: {std[3]:.2f} cm" "\n"
-            fr"$\bar x_ 4$: {moyennes[4]:.2f}, $\sigma_ 4$: {std[4]:.2f} cm",
+            fr"$\bar x_ 3$: {moyennes[3]:.2f} cm, $\sigma_ 3$: {std[3]:.2f} cm" "\n"
+            fr"$\bar x_ 4$: {moyennes[4]:.2f} cm, $\sigma_ 4$: {std[4]:.2f} cm",
             verticalalignment ='bottom', horizontalalignment ='left')
 
     '''
