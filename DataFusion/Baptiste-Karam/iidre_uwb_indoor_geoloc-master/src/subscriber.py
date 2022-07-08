@@ -34,8 +34,8 @@ class iidre_listner:
 
     def parsing(self, data):
         '''This enables to only take the relevant information of the message it hears.
-           So, it splits the information at each ':' to first see if the information is about
-           the distance between each anchor and the tag or the position of the tag.
+           So, it splits the information at each ':' to first see when the information is about
+           the position of the tag.
            Then, it reduces the size of the data to only write in the file the information we want.
         '''
         fb = data.data.split(":")
