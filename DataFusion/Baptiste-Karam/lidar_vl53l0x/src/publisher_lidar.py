@@ -21,17 +21,15 @@ class LiDAR_publisher(object):
         self.topic_name = rospy.Publisher('range', String, queue_size=10)
 
     def run(self):
-        '''Impose the data rate (50 Hz here) of the loop.
-           Enter in an infinite loop to read a line from serial link,
+        '''Enter in an infinite loop to read a line from serial link,
            pre-process the string and calls the publish method.
+           Nota Bene : The rate is defined by the LiDAR according to the mode that you chose.
         '''
-        rate = rospy.Rate(50) #50 Hz => 20 ms
         tof = VL53L0X.VL53L0X()
         while not rospy.is_shutdown():
             try:
                 tof.start_ranging(VL53L0X.VL53L0X_HIGH_SPEED_MODE)
                 self.publish(tof)
-                rate.sleep()
             except (ValueError, IndexError):
                 # Ignore the frame in case of any parsing error
                 rospy.loginfo("Error when parsing a frame from serial")

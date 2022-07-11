@@ -5,8 +5,6 @@ import time, os, sys
 import numpy as np
 import argparse
 
-
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
@@ -46,39 +44,46 @@ if __name__ == '__main__':
             x_acc, y_acc, z_acc = map(float, acc.split(',')[:3])
             data.append([x_acc,y_acc,z_acc])
 
-    # Position définie de manière brute premièrement en attendant d'avoir des valeurs réalistes
-    position = np.ones((len(data),3))
-    for i in range(len(data)) :
-        position[i,0] = position[i,0]*2*i
-
     data = np.array(data)
 
     import matplotlib.pyplot as plt
     from matplotlib import ticker
 
     X_acc, Y_acc, Z_acc = data[:,0], data[:,1], data[:,2]
-    X_pos, Y_pos, Z_pos = position[:,0], position[:,1], position[:,2]
 
     from mpl_toolkits.mplot3d import Axes3D
 
-    fig = plt.figure()
+    fig, axes = plt.subplots(3,1)
     plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
     fig.set_size_inches((11,9))
     fig.suptitle(f"Plot data from file <{data_file}>", fontsize=16)
-    axe = fig.add_subplot(111, projection='3d')
 
-    axe.set_ylim(0, 300)
-    axe.set_xlim(0, 300)
-    axe.set_zlim(0, 300)
-    axe.quiver(X_pos, Y_pos, Z_pos, X_acc, Y_acc, Z_acc,color='g')
-    axe.plot(X_pos, Y_pos, Z_pos, markersize=0.2, linestyle=':',linewidth=1, color='m')
-    axe.set_title("Acceleration")
-    axe.set_xlabel("X position [cm]")
-    axe.set_ylabel("Y Position [cm]")
-    axe.set_zlabel("Z Position [cm]")
+    axe = axes[0]
+    axe.set_ylim(0, 15)
+    axe.plot(X_acc, markersize=5, marker='x', linestyle = ' ', color='r', label="X acceleration")
+    axe.set_title("Acceleration selon X")
+    axe.set_xlabel("Time [s]")
+    axe.set_ylabel(r"Acceleration [m/$s^2$]")
+    axe.legend()
     axe.grid(True)
 
+    axe = axes[1]
+    axe.set_ylim(0, 15)
+    axe.plot(Y_acc, markersize=5, marker='x', linestyle = ' ', color='g', label="Y acceleration")
+    axe.set_title("Acceleration selon Y")
+    axe.set_xlabel("Time [s]")
+    axe.set_ylabel(r"Acceleration [m/$s^2$]")
+    axe.legend()
+    axe.grid(True)
 
+    axe = axes[2]
+    axe.set_ylim(0, 15)
+    axe.plot(Z_acc, markersize=5, marker='x', linestyle = ' ', color='b', label="Z acceleration")
+    axe.set_title("Acceleration selon Z")
+    axe.set_xlabel("Time [s]")
+    axe.set_ylabel(r"Acceleration [m/$s^2$]")
+    axe.legend()
+    axe.grid(True)
     #
     plt.savefig(data_file.replace('.txt','.png'))
     plt.show()

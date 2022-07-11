@@ -61,7 +61,6 @@ class UwbXyzPublisher(object):
         # Delete the informations about the velocity
         line=line[:len(line)-4]
 
-        #Partie modifiée par nous
         self.topic_name.publish(line)
 
 if __name__ == "__main__":

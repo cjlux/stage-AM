@@ -68,17 +68,12 @@ if __name__ == '__main__':
        distance_dbg[key]=np.array(val)
 
     # Calcul de la moyenne et de la variance pour la position
-    nbPoints = len(data)
-    delta = []
-    for i in range(nbPoints-1):
-        delta.append(data[i+1,1] - data[i,1])   # Concatène la différence entre les données selon X
-    delta = np.array(delta, int)                # Cast les données en array
-    moyennes = [delta.mean()]                   # Calcule la moyenne de la différence entre les données selon X
-    std = [delta.std()]                         # Calcule l'écart-type de la différence entre les données selon X
+    moyennes = []                                 # Initialise le tableau des moyennes
+    std = []                                      # Initialise le tableau des écart-types
     nbVar = 3
-    for var in range(nbVar-1) :                 # Répète les étapes précédentes selon les autres dimensions
+    for var in range(nbVar-1) :                   # Calcule la moyenne et l'écart-type selon les différentes dimensions
         moyennes.append(data.mean(axis=0)[var+1])
-        std.append(3*data.std(axis=0)[var+1])
+        std.append(data.std(axis=0)[var+1])
 
     T, X, Y = data[:,0], data[:,1], data[:,2]
     T = (T - T[0])*1e-3
@@ -88,60 +83,54 @@ if __name__ == '__main__':
     fig.set_size_inches((11,9))
     fig.suptitle(f"Plot of {tag} data from file <{data_file}>", fontsize=16)
 
+    ymax = 400
+    box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
+
     axe = axes[0]
-    axe.set_title("X & Y pos. versus time")
-    #axe.set_xlabel("Time [sec]")
+    axe.set_title("X & Y pos. versus time (trame : +MPOS)")
+    axe.set_xlabel("Time [sec]")
     axe.set_ylabel("Position [cm]")
     axe.plot(T, X, markersize=0.2, linewidth=1.5, color='b', label="X pos", linestyle=':')
     axe.plot(T, Y, markersize=0.2, linewidth=1.5, color='r', label="Y pos", linestyle=':')
-    axe.set_ylim(0, 300)
+    axe.set_ylim(0, ymax)
     axe.grid(True)
     axe.legend()
-    axe.text(0, 0,
-            fr"$\bar x$: {moyennes[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm" "\n"
-            fr"$\bar y$: {moyennes[2]:.2f} cm, $\sigma$: {std[2]:.2f} cm",
-            verticalalignment ='bottom', horizontalalignment ='left')
+    axe.text(0, ymax * 0.98,
+            fr"$\bar x$: {moyennes[0]:.2f} cm, $\sigma$: {std[0]:.2f} cm" "\n"
+            fr"$\bar y$: {moyennes[1]:.2f} cm, $\sigma$: {std[1]:.2f} cm",
+            verticalalignment ='top', horizontalalignment ='left', fontsize=9, bbox=box)
 
     # Calcul de la moyenne et de la variance pour les distances
-    nbPoints = len(distance["556509AF"])
-    for (key, val) in enumerate(distance.items()):
-         if nbPoints > len(distance[val[0]]):
-            nbPoints = len(distance[val[0]])
-    delta = []
-    for i in range(nbPoints-1):
-        delta.append(distance["556509AF"][i+1,1] - distance["556509AF"][i,1])   # Concatène la différence entre les distances
-    delta = np.array(delta, int)                        # Cast les données en array
-    moyennes = [delta.mean()]                           # Calcule la moyenne de la différence entre les distances
-    std = [delta.std()]                                 # Calcule l'écart-type de la différence entre les ddistances
-    nbVar = 3
-    for (key, val) in enumerate(distance.items()):      # Répète les étapes précédentes pour les autres ancres
-        moyennes.append(distance[val[0]][0:nbPoints-1,1].mean(axis=0))
-        std.append(3*distance[val[0]][0:nbPoints-1,1].std(axis=0))
+    moyennes = []                                       # Initialise le tableau des moyennes
+    std = []                                            # Initialise le tableau des écart-types
+    for (key, val) in enumerate(distance.items()):      # Calcule la moyenne et l'écart-type selon les différentes dimensions
+        moyennes.append(distance[val[0]][:,1].mean(axis=0))
+        std.append(distance[val[0]][:,1].std(axis=0))
 
     axe = axes[1]
-    axe.set_title("DIST anchor-tag")
-    #axe.set_xlabel("Time [sec]")
+    axe.set_title("Distance anchor-tag (trame : +DIST)")
+    axe.set_xlabel("Time [sec]")
     axe.set_ylabel("distance [cm]")
     colors = ["r", "g", "b", "m"]
     for i, (key, val) in enumerate(distance.items()):
         T, D = val[:,0], val[:,1]
         T = (T - T[0])*1e-3
         axe.plot(T, D, markersize=0.2, linewidth=1.5, color=colors[i], label=key, linestyle=':')
-    axe.set_ylim(100, 350)
+    axe.set_ylim(0, ymax)
     axe.grid(True)
     axe.legend()
-    axe.text(0, 110,
-            fr"$\bar x_ 1$: {moyennes[1]:.2f} cm, $\sigma_ 1$: {std[1]:.2f} cm" "\n"
-            fr"$\bar x_ 2$: {moyennes[2]:.2f} cm, $\sigma_ 2$: {std[2]:.2f} cm",
-            verticalalignment ='bottom', horizontalalignment ='left')
-    axe.text(20, 110,
-            fr"$\bar x_ 3$: {moyennes[3]:.2f} cm, $\sigma_ 3$: {std[3]:.2f} cm" "\n"
-            fr"$\bar x_ 4$: {moyennes[4]:.2f} cm, $\sigma_ 4$: {std[4]:.2f} cm",
-            verticalalignment ='bottom', horizontalalignment ='left')
+    axe.text(0, ymax * 0.98,
+            fr"$\bar x_ 1$: {moyennes[0]:.2f} cm, $\sigma_ 1$: {std[0]:.2f} cm" "\n"
+            fr"$\bar x_ 2$: {moyennes[1]:.2f} cm, $\sigma_ 2$: {std[1]:.2f} cm",
+            verticalalignment ='top', horizontalalignment ='left', fontsize=9, bbox=box)
+    axe.text(T[-1] * 0.5, ymax * 0.98,
+            fr"$\bar x_ 3$: {moyennes[2]:.2f} cm, $\sigma_ 3$: {std[2]:.2f} cm" "\n"
+            fr"$\bar x_ 4$: {moyennes[3]:.2f} cm, $\sigma_ 4$: {std[3]:.2f} cm",
+            verticalalignment ='top', horizontalalignment ='left', fontsize=9, bbox=box)
 
     '''
     axe = axes[2]
-    axe.set_title("DIST_DBG anchor-tag")
+    axe.set_title("Distance anchor-tag (trame : +DIST_DBG)")
     axe.set_xlabel("Time [sec]")
     axe.set_ylabel("distance [cm]")
     colors = ["r", "g", "b", "m"]
@@ -149,7 +138,7 @@ if __name__ == '__main__':
         T, D = val[:,0], val[:,1]
         T = (T - T[0])*1e-3
         axe.plot(T, D, markersize=0.2, linewidth=1.5, color=colors[i], label=key, linestyle=':')
-    axe.set_ylim(100, 350)
+    axe.set_ylim(0, 350)
     axe.grid(True)
     axe.legend()
 
