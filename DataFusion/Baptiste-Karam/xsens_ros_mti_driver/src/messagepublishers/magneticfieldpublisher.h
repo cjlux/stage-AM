@@ -66,10 +66,6 @@ struct MagneticFieldPublisher : public PacketCallback
             // TODO: Use sensor_msgs::MagneticField
             // Problem: Sensor gives normalized magnetic field vector with unknown units
             geometry_msgs::Vector3Stamped msg;
-	    ros::Rate loop_rate(100); // 10 ms
-	    int count = 0;
-	    while (ros::ok())
-	    {
 
             	msg.header.stamp = timestamp;
             	msg.header.frame_id = frame_id;
@@ -85,10 +81,6 @@ struct MagneticFieldPublisher : public PacketCallback
             	// msg.magnetic_field_covariance[8] = magnetic_field_variance[2];
 
             	pub.publish(msg);
-	    	loop_rate.sleep();
-		++count;
-		//printf("%d\n", count);
-	    }
         }
     }
 };

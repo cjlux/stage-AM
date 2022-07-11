@@ -61,11 +61,6 @@ struct AccelerationPublisher : public PacketCallback
         if (packet.containsCalibratedAcceleration())
         {
             geometry_msgs::Vector3Stamped msg;
-	    ros::Rate loop_rate(100); 	//100Hz
-	    int count = 0;
-
-	    while(ros::ok())
-	    {
             	msg.header.stamp = timestamp;
             	msg.header.frame_id = frame_id;
 
@@ -76,10 +71,6 @@ struct AccelerationPublisher : public PacketCallback
             	msg.vector.z = accel[2];
 
             	pub.publish(msg);
-	    	loop_rate.sleep();
-		++count;
-		//printf("%d\n", count);
-	    }
         }
     }
 };

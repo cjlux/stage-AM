@@ -63,9 +63,6 @@ struct AngularVelocityPublisher : public PacketCallback
             geometry_msgs::Vector3Stamped msg;
 	    ros::Rate loop_rate(100); //100Hz
 
-	    int count = 0;
-	    while(ros::ok())
-	    {
             	std::string frame_id = DEFAULT_FRAME_ID;
             	ros::param::getCached("~frame_id", frame_id);
 
@@ -80,9 +77,6 @@ struct AngularVelocityPublisher : public PacketCallback
 
             	pub.publish(msg);
 	    	loop_rate.sleep();
-		++count;
-		//printf("%d\n", count);
-	    }
 
         }
     }
