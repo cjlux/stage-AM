@@ -13,8 +13,11 @@ if __name__ == '__main__':
                         help="path of the data file")
     parser.add_argument('--stat', action="store_true",
                          help="wether to compute and plot mean and std")
+    parser.add_argument('--plot_by_rank', action="store_true",
+                         help="drop temporal data and use ranks for abscissas.")
     args = parser.parse_args()
     stat = args.stat
+    plot_by_rank = args.plot_by_rank
     data_file = args.data_file
 
     if data_file is None:
@@ -51,7 +54,14 @@ if __name__ == '__main__':
 
     data = np.array(data)
 
-    T, Z = data[:,0], data[:,1]
+    Z = data[:,1]
+
+    if plot_by_rank:
+        T = range(len(T))
+        x_label = "rank"
+    else:
+        T = data[:,0] - data[0,0]
+        x_label = "time [second]"
 
     fig = plt.figure()
     #plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
@@ -62,8 +72,8 @@ if __name__ == '__main__':
     marker_size = 5 if len(Z) <= 30 else 1
     axe.set_title("Z (ground distance in the direction of the LiDAR sight)")
     axe.plot(T, Z, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
-    axe.set_xlabel("time [second]")
     axe.set_ylabel("distance [mm]")
+    axe.set_xlabel(x_label)
     ymax = 1300
     axe.set_ylim(0, ymax)
     if stat:

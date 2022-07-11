@@ -10,13 +10,13 @@ class LiDAR_listener:
        registered in the tree where the code is executed.
     '''
     def __init__(self, opened_log_file, duration=None, verbose=False):
-        '''Parameters :
+        '''Parameters:
                 opened_log_file : the file where the data are stored
-                duration : duration of the algorithm's execution
-                verbose : define if there will be messages printed in the terminal
-           Functions :
-           rospy.Subscriber takes in parameters : the topic on which it is registered
-           as a subscriber, the given type of the messages and a function to write what it hears.
+                duration: duration of the algorithm's execution
+                verbose: define if there will be messages printed in the terminal
+           Functions:
+           rospy.Subscriber takes in parameters: the topic on which it is registered
+           as a subscriber, the given type of the messages and a function to write what it gets.
            The current time is also collected to apply the duration you want.
         '''
         self.verbose = verbose
@@ -25,9 +25,9 @@ class LiDAR_listener:
         print("instance of LiDAR_listen created...")
 
     def callback(self, data):
-        '''It writes a message in rospy.loginfo about the data
-           it hears (when the verbose variable is set to True). Then, it writes the
-           data in the file.
+        '''Write a message in rospy.loginfo about the data it gets 
+           (when the verbose variable is set to True). 
+           Then, it writes the data in the file.
         '''
 
         # self.parsing(data)
