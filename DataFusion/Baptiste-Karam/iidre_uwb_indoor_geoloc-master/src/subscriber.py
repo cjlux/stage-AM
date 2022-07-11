@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
+
 import time, sys
 import rospy
-
 from std_msgs.msg import String
 
 class iidre_listner:
@@ -34,8 +34,8 @@ class iidre_listner:
 
     def parsing(self, data):
         '''This enables to only take the relevant information of the message it hears.
-           So, it splits the information at each ':' to first see if the information is about
-           the distance between each anchor and the tag or the position of the tag.
+           So, it splits the information at each ':' to first see when the information is about
+           the position of the tag.
            Then, it reduces the size of the data to only write in the file the information we want.
         '''
         fb = data.data.split(":")
@@ -43,34 +43,9 @@ class iidre_listner:
         fb_data = fb[1].split(",")
         time = fb_data[0]
 
-        if fb_cmd == "+DIST":
-            # This is usable even if the device has not been preconfigured with the uwbSupervisor
-            # Just triangulate the distance (not done here)
-            # anchor_id = fb_data[1]
-            # anchor_dist = fb_data[2]
-            # anchor_xyz = fb_data[3:6]
-            # ax_m, ay_m, az_m = map(lambda x: float(x), anchor_xyz)
-            data.data = [fb_data[1:6]]
-
-            # if self.publish_anchors:
-            #    self.tfb.sendTransform(
-            #        (ax_m, ay_m, az_m), (0, 0, 0, 1),   # device position, quaternion
-            #        rospy.Time.now(),
-            #        anchor_id,
-            #        self.device_frame_id)
-
-        elif fb_cmd == "+MPOS":
+        if fb_cmd == "+MPOS":
             # This is usable if device has been preconfigured with the uwbSupervisor
-            # x, y, z = fb_data[1:4]
-            # Convert from centimeters (in the JSON infra file) to meters
-            # x_m, y_m, z_m = map(lambda x: float(x), [x, y, z])
             data.data = [fb_data[1], fb_data[2]]
-
-            # self.tfb.sendTransform(
-            #    (x_m, y_m, z_m), (0, 0, 0, 1),   # device position, quaternion
-            #    rospy.Time.now(),
-            #    self.device_name,
-            #    self.device_frame_id)
 
 
 if __name__ == '__main__':

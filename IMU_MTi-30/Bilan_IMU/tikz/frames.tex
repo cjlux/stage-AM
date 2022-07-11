@@ -1,0 +1,59 @@
+\documentclass{standalone}
+
+\setlength{\unitlength}{1mm}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{shapes.geometric}
+
+\usepackage{pgfplots}
+\usepackage{fontawesome}
+\usepackage{latexsym}
+
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{foreground}
+\pgfsetlayers{background,main,foreground}
+
+\begin{document}
+\pagestyle{empty}
+
+\definecolor{orange}{RGB}{255,140,0}
+\definecolor{darkGreen}{RGB}{50,200,50}
+
+\begin{tikzpicture}
+
+  \begin{pgfonlayer}{foreground}
+  
+    \draw[->, ultra thick, red,  arrows={-latex}]  (0,0) -- (2,0) node[right] {$X_E$};
+    \draw[->, ultra thick, darkGreen,  arrows={-latex}]  (0,0) -- (1, 1) node[right] {$Y_E$};
+    \draw[->, ultra thick, blue,  arrows={-latex}]  (0,0) -- (0,2) node[above] {$Z_E$};
+    \draw  (0,0) node {\small $\bullet$};
+    \draw  (0,0) node[below] {\small $O$};
+  
+    \draw[->, ultra thick, red,  arrows={-latex}]   (5,3) -- (6.3, 5.9) node[above] {$x_v$};
+    \draw[->, ultra thick, darkGreen, arrows={-latex}] (5,3) -- (6.9,3.4) node[right] {$y_v$};
+    \draw[->, ultra thick, blue,  arrows={-latex}]  (5,3) -- (4.0, 4.3) node[left] {$z_v$};
+    \draw  (5,3) node {\small $\bullet$};
+    \draw  (5,3) node[below left] {\small $G$};
+
+    \end{pgfonlayer}
+
+
+    \draw[] node[isosceles triangle, fill=orange!80, minimum size=12mm, rotate=64] (T) at (4.7,2.4){};
+    \fill[orange!80, rotate=-25, yshift=68, xshift=-50] (5,3) ellipse(0.3 and 1.8);
+
+    \draw[line width=.3mm,color=blue, <-, yshift=85, xshift=-30, rotate=-25] (5,3) arc (40:320:2mm and 3mm);
+    \draw[blue]  (4.7, 3.9) node{\small yaw};
+
+    \draw[line width=.3mm,color=red, ->, yshift=-15, xshift=168, rotate=60] (5,3) arc (40:320:2mm and 3mm);
+    \draw[red]  (6.5, 4.9) node{\small roll};
+    
+    \draw[line width=.3mm,color=darkGreen, <-, yshift=13, xshift=35, rotate=0] (5,3) arc (40:320:2mm and 3mm);
+    \draw[darkGreen]  (6.3, 3.8) node{\small pitch};
+
+    \draw (3, -1) node {\small $[O, (X_E,Y_E,Z_E)]$: inertial frame fixed to the Earth};
+    \draw (3.3, -1.5) node {\small $[G, (x_v,y_v,z_v)]$: non inertial frame fixed to the vehicule};
+
+\end{tikzpicture}
+
+
+\end{document}

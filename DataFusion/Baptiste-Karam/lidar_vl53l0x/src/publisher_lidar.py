@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+import serial
 from std_msgs.msg import String
 import VL53L0X
 
@@ -18,21 +19,6 @@ class LiDAR_publisher(object):
         rospy.init_node("publisher_lidar")
         self.serial = None
         self.topic_name = rospy.Publisher('range', String, queue_size=10)
-        self.device_name = rospy.get_param("name", "LiDAR")
-        self.device_port = rospy.get_param("port", "GPiO")
-
-    def connect(self):
-        '''Try to connect on the serial link. Write messages in rospy.loginfo.
-        '''
-        if self.serial is not None:
-            try:
-                self.serial.close()
-            except:
-                pass
-
-        rospy.loginfo("Connecting to {}...".format(self.device_port))
-        self.serial = serial.Serial(self.device_port)
-        rospy.loginfo(f"Connected! Now publishing data from '{self.device_name}'...")
 
     def run(self):
         '''Impose the data rate (50 Hz here) of the loop.
@@ -40,9 +26,9 @@ class LiDAR_publisher(object):
            pre-process the string and calls the publish method.
         '''
         rate = rospy.Rate(50) #50 Hz => 20 ms
+        tof = VL53L0X.VL53L0X()
         while not rospy.is_shutdown():
             try:
-                tof = VL53L0X.VL53L0X()
                 tof.start_ranging(VL53L0X.VL53L0X_HIGH_SPEED_MODE)
                 self.publish(tof)
                 rate.sleep()
@@ -54,12 +40,11 @@ class LiDAR_publisher(object):
                 rospy.sleep(2)
                 self.connect()
 
-    def publisher_lidar(self, tof):
+    def publish(self, tof):
         '''Publish the data on the topic
         '''
-        self.topic_name.publish(f"{rospy.get_time()},{tof.get_distance()}")
+        self.topic_name.publish("{},{}".format(rospy.get_time(), tof.get_distance()))
 
 if __name__ == '__main__':
     node = LiDAR_publisher()
-    node.connect()
     node.run()
