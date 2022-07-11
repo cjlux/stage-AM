@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import time, sys
+import argparse
 import rospy
 from std_msgs.msg import String
 
@@ -42,7 +43,15 @@ if __name__ == '__main__':
 
    import time, sys
 
-   uniq_file_name = f"./Data_LiDAR_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--file_prefix", type=str, default="")
+   args = parser.parse_args()
+   file_prefix = args.file_prefix
+
+   uniq_file_name = f"./LiDAR_"
+   if file_prefix != "":
+      uniq_file_name += f"{file_prefix}_"
+   uniq_file_name += f"{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 
    with open(uniq_file_name, "w") as f:
@@ -57,3 +66,4 @@ if __name__ == '__main__':
 
         # spin() simply keeps python from exiting until this node is stopped
         rospy.spin()
+

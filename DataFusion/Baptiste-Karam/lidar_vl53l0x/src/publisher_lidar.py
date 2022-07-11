@@ -32,7 +32,7 @@ class LiDAR_publisher(object):
         tof = VL53L0X.VL53L0X()
         while not rospy.is_shutdown():
             try:
-                tof.start_ranging(self.mode)
+                tof.start_ranging(LiDAR_publisher[self.mode])
                 self.publish(tof)
             except (ValueError, IndexError):
                 # Ignore the frame in case of any parsing error
@@ -51,7 +51,7 @@ class LiDAR_publisher(object):
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lidar_mode", type=str, default=None,
+    parser.add_argument("--lidar_mode", type=str, default="",
                         help="Lidar mode in ('GOOD_ACCURACY', 'BETTER_ACCURACY', 'BEST_ACCURACY', 'LONG_RANGE', 'HIGH_SPEED')")
     args = parser.parse_args()
     lidar_mode = args.lidar_mode

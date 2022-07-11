@@ -57,7 +57,7 @@ if __name__ == '__main__':
     Z = data[:,1]
 
     if plot_by_rank:
-        T = range(len(T))
+        T = range(len(Z))
         x_label = "rank"
     else:
         T = data[:,0] - data[0,0]
