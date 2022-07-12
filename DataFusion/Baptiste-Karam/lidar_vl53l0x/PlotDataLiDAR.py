@@ -54,13 +54,16 @@ if __name__ == '__main__':
 
     data = np.array(data)
 
-    Z = data[:,1]
+    T, Z = data[:,0], data[:,1]
+
+    dt_array = T[1:]-T[:-1]
+    dt, dt_mean, dt_std = dt_array[0]*1e3, dt_array.mean()*1e3, dt_array.std()*1e3
 
     if plot_by_rank:
         T = range(len(Z))
         x_label = "rank"
     else:
-        T = data[:,0] - data[0,0]
+        T -= data[0,0]
         x_label = "time [second]"
 
     fig = plt.figure()
@@ -79,13 +82,15 @@ if __name__ == '__main__':
     if stat:
         z_mean, z_std = Z.mean(), Z.std()
         z_min, z_max = Z.min(), Z.max()
-        text = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-        text += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
-        print(text)
+        text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
+        text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+        text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
+        print(text1)
+        print(text2)
         box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
         axe.text(0, ymax*.98,
                  fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm",
+                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box)
     axe.grid(True)
     axe.legend()
