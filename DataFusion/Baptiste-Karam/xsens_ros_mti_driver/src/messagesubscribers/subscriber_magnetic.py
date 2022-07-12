@@ -26,18 +26,22 @@ class xsens_mti_listener:
     def callback(self, data):
 	''' This function calls data when it is received.
 	    It calls the parsing() function,
-	    Then it displays the 3 magnetic components when verbose=True
+	    Then it displays time and the 3 magnetic components when verbose=True
 	    Parameters:
 	    Data: data received
 	'''
         self.parsing(data)
         if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
-        self.log_file.write(str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
+        self.log_file.write("Time: "+str(data.header)+", magnetic: "+str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
 
     def parsing(self, data):
 	''' This function receives data as argument.
-	    It splits data to get only the magnetic component
+	    It splits data to get only time and the magnetic component
 	'''
+        data.header = str(data.header).replace("\n", ":")
+        tmp_data = data.header.split(":")
+        data.header = float(tmp_data[5]) + int(tmp_data[7]) * 1e-9
+
         data.vector = str(data.vector).replace("\n", ":")       # Replace the \n by : in the str
         fb_data = data.vector.split(":")                        # Récupère les accelerations selon x, y et z
 
@@ -45,7 +49,12 @@ class xsens_mti_listener:
 
 if __name__ == '__main__':
 
-   with open("./Data_mti_magnetic.txt", "w") as f:
+   import time
+
+   uniq_file_name = f"./Data_Mti_magnetic{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   print(f"writing data in <{uniq_file_name}>")
+
+   with open(uniq_file_name, "w") as f:
 
         listner = xsens_mti_listener(f)
 

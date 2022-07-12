@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-import rospy
 
+import rospy
 from std_msgs.msg import String
-from geometry_msgs.msg import Vector3Stamped
+from geometry_msgs.msg import QuaternionStamped
+import tf
 
 class xsens_mti_listener:
     '''
        This class registers what come from a specified topic.
-       It displays the 3 components of linear acceleration
+       It displays the Euler angle Roll, Pitch, Yaw
     '''
 
     def __init__(self, opened_log_file, verbose=False):
@@ -21,40 +22,46 @@ class xsens_mti_listener:
         '''
         self.verbose = verbose
         self.log_file = opened_log_file
-        self.subscriber = rospy.Subscriber("/imu/acceleration", Vector3Stamped, self.callback)
+        self.subscriber = rospy.Subscriber("/filter/quaternion", QuaternionStamped, self.callback)
         print("instance of xsens_mti_listen created...")
 
     def callback(self, data):
         ''' This function calls data when it is received.
-            It calls the parsing() function,
-            Then it displays time and the 3 components of linear acceleration when verbose=True
+            It calls the parsing() function, which reurns the quatenion components
+            Then it convers quaternion vectore to Euler angles
+            And it displays time and Euler angles when verbose=True
             Parameters:
             Data: data received
         '''
+
         self.parsing(data)
+
+        # Transformation quaternion to Euler
+        euler = tf.transformations.euler_from_quaternion(data.quaternion)
+
         if self.verbose:
-          rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
-        self.log_file.write("Time: "+str(data.header)+", Acceleration: "+str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
+          rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.quaternion))
+        self.log_file.write("Time: "+str(data.header)+", Euler: "+str(euler[0])+","+str(euler[1])+","+str(euler[2])+"\n")
 
     def parsing(self, data):
         ''' This function receives data as argument.
-            It splits data to get only the timestamp and linear acceleration
+            It splits data to get only time and the quaternion
         '''
         data.header = str(data.header).replace("\n", ":")
         tmp_data = data.header.split(":")
         data.header = float(tmp_data[5]) + int(tmp_data[7]) * 1e-9
 
-        data.vector = str(data.vector).replace("\n", ":")       # Replace the \n by : in the str
-        fb_data = data.vector.split(":")                        # Récupère les accelerations selon x, y et z
-
-        data.vector = [fb_data[1],fb_data[3],fb_data[5]]
+        data.quaternion = str(data.quaternion).replace("\n", ":")       # Replace the \n by : in the str
+        fb_data = data.quaternion.split(":")                            # Récupère les accelerations selon x, y et z
+        data.quaternion = [fb_data[1],fb_data[3],fb_data[5],fb_data[7]]
 
 if __name__ == '__main__':
 
    import time
 
-   uniq_file_name = f"./Data_MTi_acceleration_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   uniq_file_name = f"./Data_MTi_quaternion_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
+
 
    with open(uniq_file_name, "w") as f:
 
