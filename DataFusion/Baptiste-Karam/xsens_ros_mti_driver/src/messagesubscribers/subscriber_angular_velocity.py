@@ -33,12 +33,16 @@ class xsens_mti_listener:
 	'''
 	self.parsing(data)
         if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
-        self.log_file.write(str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
+        self.log_file.write("Time: "+str(data.header)+", Angular_velocity: "+str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
 
     def parsing(self, data):
 	''' This function receives data as argument.
 	    It splits data to get only the angular velocity
 	'''
+        data.header = str(data.header).replace("\n", ":")
+        tmp_data = data.header.split(":")
+        data.header = float(tmp_data[5]) + int(tmp_data[7]) * 1e-9
+
         data.vector = str(data.vector).replace("\n", ":")       # Replace the \n by : in the str
         fb_data = data.vector.split(":")                        # Récupère les accelerations selon x, y et z
 
@@ -47,7 +51,12 @@ class xsens_mti_listener:
 
 if __name__ == '__main__':
 
-   with open("./Data_mti_angular_velocity.txt", "w") as f:
+   import time
+
+   uniq_file_name = f"./Data_MTi_angular_velocity_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   print(f"writing data in <{uniq_file_name}>")
+
+   with open(uniq_file_name, "w") as f:
 
         listner = xsens_mti_listener(f)
 
