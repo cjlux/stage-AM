@@ -38,18 +38,23 @@ if __name__ == '__main__':
 
     with open(data_file, "r", encoding="utf8") as F:
         for line in F:
-            acc = line.strip()     # clean line with \r,\n... at begin or end
-            if acc.startswith("#"):
+            line = line.strip()     # clean line with \r,\n... at begin or end
+            if line.startswith("#"):
                 continue   # skip comment lines
-            x_acc, y_acc, z_acc = map(float, acc.split(',')[:3])
-            data.append([x_acc,y_acc,z_acc])
+            type_time, time_type, info = line.split(":")
+            x, y, z = map(float, info.split(',')[:])
+            time = float(time_type.split(',')[0])
+            data.append([time,x,y,z])
 
     data = np.array(data)
 
     import matplotlib.pyplot as plt
     from matplotlib import ticker
 
-    X_acc, Y_acc, Z_acc = data[:,0], data[:,1], data[:,2]
+    X, Y, Z = data[:,1], data[:,2], data[:,3]
+    T = data[:,0]
+
+    T = T - T[0]
 
     from mpl_toolkits.mplot3d import Axes3D
 
@@ -60,7 +65,7 @@ if __name__ == '__main__':
 
     axe = axes[0]
     axe.set_ylim(0, 15)
-    axe.plot(X_acc, markersize=5, marker='x', linestyle = ' ', color='r', label="X acceleration")
+    axe.plot(T, X, markersize=5, marker='x', linestyle = ' ', color='r', label="X acceleration")
     axe.set_title("Acceleration selon X")
     axe.set_xlabel("Time [s]")
     axe.set_ylabel(r"Acceleration [m/$s^2$]")
@@ -69,7 +74,7 @@ if __name__ == '__main__':
 
     axe = axes[1]
     axe.set_ylim(0, 15)
-    axe.plot(Y_acc, markersize=5, marker='x', linestyle = ' ', color='g', label="Y acceleration")
+    axe.plot(T, Y, markersize=5, marker='x', linestyle = ' ', color='g', label="Y acceleration")
     axe.set_title("Acceleration selon Y")
     axe.set_xlabel("Time [s]")
     axe.set_ylabel(r"Acceleration [m/$s^2$]")
@@ -78,7 +83,7 @@ if __name__ == '__main__':
 
     axe = axes[2]
     axe.set_ylim(0, 15)
-    axe.plot(Z_acc, markersize=5, marker='x', linestyle = ' ', color='b', label="Z acceleration")
+    axe.plot(T, Z, markersize=5, marker='x', linestyle = ' ', color='b', label="Z acceleration")
     axe.set_title("Acceleration selon Z")
     axe.set_xlabel("Time [s]")
     axe.set_ylabel(r"Acceleration [m/$s^2$]")
