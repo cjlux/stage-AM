@@ -78,6 +78,9 @@ class Plot_IMU(object):
 
         T = T - T[0]
 
+        dt_array = T[1:]-T[:-1]
+        dt, dt_mean, dt_std = dt_array[0]*1e3, dt_array.mean()*1e3, dt_array.std()*1e3
+
         fig, axes = plt.subplots(3,1)
         plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
         fig.set_size_inches((11,9))
