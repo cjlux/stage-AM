@@ -1,0 +1,3 @@
+<launch>
+    <node name="lidar_vl53l0x" pkg="lidar_vl53l0x" type="publisher_lidar.py" output="screen"/>
+</launch>
