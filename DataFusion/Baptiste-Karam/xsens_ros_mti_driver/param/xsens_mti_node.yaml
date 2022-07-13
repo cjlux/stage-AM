@@ -19,7 +19,7 @@ publisher_queue_size: 5
 # Baptiste & Karam - Internship ENSEIRB-MATMECA june-september 2022
 # V1.1 - modification of the amount of datas published 
 
-pub_imu: true
+pub_imu: false
 pub_quaternion: true
 pub_mag: true
 pub_angular_velocity: true
@@ -27,7 +27,7 @@ pub_acceleration: true
 pub_free_acceleration: false
 pub_dq: false
 pub_dv: false
-pub_sampletime: false
+pub_sampletime: true
 pub_temperature: false
 pub_pressure: false
 pub_gnss: false

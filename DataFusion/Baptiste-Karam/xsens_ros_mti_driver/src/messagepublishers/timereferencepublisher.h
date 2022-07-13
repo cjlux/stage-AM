@@ -55,6 +55,7 @@ struct TimeReferencePublisher : public PacketCallback
             const uint32_t ONE_GHZ = 1000000000UL;
             uint32_t sec, nsec, t_fine;
             sensor_msgs::TimeReference msg;
+            ros::Rate loop_rate(100); //100Hz
 
             t_fine = packet.sampleTimeFine();
             sec = t_fine / SAMPLE_TIME_FINE_HZ;
@@ -73,6 +74,7 @@ struct TimeReferencePublisher : public PacketCallback
             // msg.source = optional
 
             pub.publish(msg);
+            loop_rate.sleep();
         }
     }
 };

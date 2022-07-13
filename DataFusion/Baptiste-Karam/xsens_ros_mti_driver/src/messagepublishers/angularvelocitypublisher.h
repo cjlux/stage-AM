@@ -61,23 +61,20 @@ struct AngularVelocityPublisher : public PacketCallback
         if (packet.containsCalibratedGyroscopeData())
         {
             geometry_msgs::Vector3Stamped msg;
-	    ros::Rate loop_rate(100); //100Hz
 
-            	std::string frame_id = DEFAULT_FRAME_ID;
-            	ros::param::getCached("~frame_id", frame_id);
+	    std::string frame_id = DEFAULT_FRAME_ID;
+	    ros::param::getCached("~frame_id", frame_id);
 
-            	msg.header.stamp = timestamp;
-            	msg.header.frame_id = frame_id;
+	    msg.header.stamp = timestamp;
+	    msg.header.frame_id = frame_id;
 
-            	XsVector gyro = packet.calibratedGyroscopeData();
+	    XsVector gyro = packet.calibratedGyroscopeData();
 
-            	msg.vector.x = gyro[0];
-            	msg.vector.y = gyro[1];
-            	msg.vector.z = gyro[2];
+	    msg.vector.x = gyro[0];
+	    msg.vector.y = gyro[1];
+	    msg.vector.z = gyro[2];
 
-            	pub.publish(msg);
-	    	loop_rate.sleep();
-
+	    pub.publish(msg);
         }
     }
 };
