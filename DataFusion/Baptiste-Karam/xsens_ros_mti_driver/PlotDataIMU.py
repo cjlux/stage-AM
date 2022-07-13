@@ -12,7 +12,7 @@ class Plot_IMU(object):
     '''
 
     TYPE_INFO = {'acceleration': ["Acceleration", "X", "Y", "Z", "m/$s^2$"],
-                 'angular_velocity': ["Angular Veolicty", "Teta", "Phi", "Psi", "rad/s"],
+                 'angular_velocity': ["Angular Veolicty", "$\theta$", "$\phi$", "$\psi$", "rad/s"],
                  'magnetic': ["Magnetic", "X", "Y", "Z", "rad/$\mu$T"],
                  'euler': ["Euler angle", "X", "Y", "Z", "rad"]}
 
@@ -150,8 +150,7 @@ class Plot_IMU(object):
         axe.legend()
         axe.grid(True)
         #
-        name_file = Plot_IMU.TYPE_INFO[self.type_info][0] + "_" + self.data_file
-        plt.savefig(name_file.replace('.txt','.png'))
+        plt.savefig(self.data_file.replace('.txt','.png'))
         plt.show()
 
 
