@@ -28,7 +28,7 @@ class xsens_mti_listener:
     def callback(self, data):
         ''' This function calls data when it is received.
             It calls the parsing() function, which reurns the quatenion components
-            Then it convers quaternion vectore to Euler angles
+            Then it convers quaternion vectors to Euler angles
             And it displays time and Euler angles when verbose=True
             Parameters:
             Data: data received

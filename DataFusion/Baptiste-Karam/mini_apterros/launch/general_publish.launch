@@ -1,5 +1,7 @@
 <launch>
-    <include file="-d $(find iidre_uwb_indoor_geoloc)/launch/publish.launch">
-    <include file="-d $(find lidar_vl53l0x)/launch/publish_lidar.launch">
-    <include file="-d $(find xsens_mti_driver)/launch/xsens_mti_node.launch">
+    <arg name="mode" default="HIGH_SPEED"/>
+    
+    <include file="$(find iidre_uwb_indoor_geoloc)/launch/publish.launch" />
+    <include file="$(find xsens_mti_driver)/launch/xsens_mti_node.launch" />
+    <include file="$(find lidar_vl53l0x)/launch/publish_lidar.launch" pass_all_args="true" />
 </launch>

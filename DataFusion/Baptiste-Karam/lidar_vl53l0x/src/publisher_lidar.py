@@ -51,12 +51,19 @@ class LiDAR_publisher(object):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--lidar_mode", type=str, default="",
-                        help="Lidar mode in ('GOOD_ACCURACY', 'BEST_ACCURACY', 'HIGH_SPEED')")
-    args = parser.parse_args()
-    lidar_mode = args.lidar_mode
-    lidar_mode = lidar_mode.upper()
+    # Old Version :
+    
+    # parser = argparse.ArgumentParser()
+    # parser = parser.replace(":="," ")
+    # parser.add_argument("--lidar_mode", "--lidar_mode:=", type=str, default="",
+    #                     help="Lidar mode in ('GOOD_ACCURACY', 'BEST_ACCURACY', 'HIGH_SPEED'), to be set in publish_lidar.launch")
+    # args = parser.parse_args()
+    # lidar_mode = args.lidar_mode
+    # lidar_mode = lidar_mode.upper()
+    
+    # New Version :    
+    
+    lidar_mode = rospy.get_param('publisher_lidar/lidar_mode')
 
     if lidar_mode in LiDAR_publisher.LIDAR_MODE.keys():
         node = LiDAR_publisher(lidar_mode)
