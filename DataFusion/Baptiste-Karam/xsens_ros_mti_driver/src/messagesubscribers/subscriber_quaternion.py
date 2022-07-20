@@ -3,7 +3,8 @@
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import QuaternionStamped
-import tf
+from scipy.spatial.transform import Rotation
+from math import radians
 
 class xsens_mti_listener:
     '''
@@ -37,11 +38,12 @@ class xsens_mti_listener:
         self.parsing(data)
 
         # Transformation quaternion to Euler
-        euler = tf.transformations.euler_from_quaternion(data.quaternion)
+        rot = Rotation.from_quat(data.quaternion)
+        euler = rot.as_euler('xyz', degrees=True)
 
         if self.verbose:
           rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.quaternion))
-        self.log_file.write("Time: "+str(data.header)+", Euler: "+str(euler[0])+","+str(euler[1])+","+str(euler[2])+"\n")
+        self.log_file.write("Time: "+str(data.header)+", Euler: "+str(radians(euler[0]))+","+str(radians(euler[1]))+","+str(radians(euler[2]))+"\n")
 
     def parsing(self, data):
         ''' This function receives data as argument.
