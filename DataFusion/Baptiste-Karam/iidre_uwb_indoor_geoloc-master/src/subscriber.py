@@ -19,7 +19,7 @@ class iidre_listner:
         '''
         self.verbose = verbose
         self.log_file = opened_log_file
-        self.subscriber = rospy.Subscriber("/chatter", String, self.callback)
+        self.subscriber = rospy.Subscriber("/iidre_position", String, self.callback)
         print("instance of iidre_listen created...")
 
     def callback(self, data):

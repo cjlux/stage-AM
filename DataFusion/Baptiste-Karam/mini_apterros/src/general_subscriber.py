@@ -5,7 +5,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import QuaternionStamped
 import message_filters
 from scipy.spatial.transform import Rotation
-from math import radians
+from math import radians, cos
 
 class miniapterros_listner:
     ''' This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
@@ -27,8 +27,8 @@ class miniapterros_listner:
         self.verbose = verbose
         self.log_file = log_file
         
-        self.subscriber_iidre = message_filters.Subscriber("/chatter", String)
-        self.subscriber_lidar = message_filters.Subscriber("/range", String)
+        self.subscriber_iidre = message_filters.Subscriber("/iidre_position", String)
+        self.subscriber_lidar = message_filters.Subscriber("/lidar_height", String)
         self.subscriber_mti = message_filters.Subscriber("/filter/quaternion", QuaternionStamped)
         print("instance of MiniApterros created ...")
 
@@ -48,12 +48,8 @@ class miniapterros_listner:
                 MTi_DATA
         '''
         self.parsing_iidre(data_iidre)
-        self.parsing_lidar(data_lidar)
         self.parsing_mti(data_mti)
-
-        # Transformation quaternion to Euler
-        rot = Rotation.from_quat(data_mti.quaternion)
-        euler = rot.as_euler('xyz', degrees=True)
+        self.parsing_lidar(data_lidar, data_mti)
 
         if self.verbose:
             rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", str(data_iidre.data), str(data_lidar.data), str(data_mti.quaternion))
@@ -61,7 +57,7 @@ class miniapterros_listner:
         self.log_file.write("Time: "+str(data_mti.header)+"\n")
         self.log_file.write("DATA_IIDRE :"+ str(data_iidre.data[0])+","+str(data_iidre.data[1])+"\n")
         self.log_file.write("DATA_LiDAR :"+ str(data_lidar.data)+"\n")
-        self.log_file.write("DATA_MTi-30 :"+str(radians(euler[0]))+","+str(radians(euler[1]))+","+str(radians(euler[2]))+"\n"+"\n")
+        self.log_file.write("DATA_MTi-30 :"+str(radians(data_mti.quaternion[0]))+","+str(radians(data_mti.quaternion[1]))+","+str(radians(data_mti.quaternion[2]))+"\n"+"\n")
 
     def parsing_iidre(self, data_iidre):
         '''This enables to only take the relevant information of the message it hears.
@@ -79,12 +75,14 @@ class miniapterros_listner:
             # Convert from centimeters (in the JSON infra file) to meters
             data_iidre.data = [fb_data[1], fb_data[2]]
 
-    def parsing_lidar(self, data_lidar):
+    def parsing_lidar(self, data_lidar, data_mti):
         '''It splits data at each ',' and takes the second part of data
-           which corresponds to the distance measured by LiDAR 
+           which corresponds to the distance measured by LiDAR and corrected
+           by the angle calculate by the MTi-30
         '''
         fb = data_lidar.data.split(",")
         data_lidar.data = fb[1]
+        data_lidar.data = int(data_lidar.data) * cos(radians(data_mti.quaternion[0])) * cos(radians(data_mti.quaternion[1]))
 
     def parsing_mti(self, data_mti):
         ''' This function receives data as argument.
@@ -97,6 +95,10 @@ class miniapterros_listner:
         data_mti.quaternion = str(data_mti.quaternion).replace("\n", ":")       # Replace the \n by : in the str
         fb_data_mti = data_mti.quaternion.split(":")                            # Récupère les accelerations selon x, y et z
         data_mti.quaternion = [fb_data_mti[1],fb_data_mti[3],fb_data_mti[5],fb_data_mti[7]]
+        
+        # Transformation quaternion to Euler
+        data_mti.quaternion = Rotation.from_quat(data_mti.quaternion)
+        data_mti.quaternion = data_mti.quaternion.as_euler('xyz', degrees=True)
         
 if __name__ == '__main__':
 

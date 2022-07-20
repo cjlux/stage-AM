@@ -24,7 +24,7 @@ class LiDAR_publisher(object):
         '''
         rospy.init_node("publisher_lidar")
         self.mode = mode
-        self.topic_name = rospy.Publisher('range', String, queue_size=10)
+        self.topic_name = rospy.Publisher('lidar_height', String, queue_size=10)
 
     def run(self):
         '''Enter in an infinite loop to read data on the I2C bus,

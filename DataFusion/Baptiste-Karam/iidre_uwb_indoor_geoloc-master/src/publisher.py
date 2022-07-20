@@ -16,7 +16,7 @@ class UwbXyzPublisher(object):
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
         self.serial = None
-        self.topic_name = rospy.Publisher('chatter', String, queue_size=10)
+        self.topic_name = rospy.Publisher('iidre_position', String, queue_size=10)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
 

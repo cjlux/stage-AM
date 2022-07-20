@@ -20,7 +20,7 @@ class LiDAR_listener:
         '''
         self.verbose = verbose
         self.log_file = opened_log_file
-        self.subscriber = rospy.Subscriber("/range", String, self.callback)
+        self.subscriber = rospy.Subscriber("/lidar_height", String, self.callback)
         print("instance of LiDAR_listen created...")
 
     def callback(self, data):
