@@ -89,67 +89,67 @@ class Plot_IMU(object):
         ymax = Plot_IMU.TYPE_INFO[self.type_info][5]
 
         axe = axes[0]
-        axe.set_ylim(-Plot_IMU.TYPE_INFO[self.type_info][5], Plot_IMU.TYPE_INFO[self.type_info][5])
+        axe.set_ylim(-ymax, ymax)
         axe.plot(T, X, '.:b', markersize=marker_size, linewidth=0.3, color='r', label=f"{Plot_IMU.TYPE_INFO[self.type_info][1]} {self.type_info}")
         axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][1]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            x_mean, x_std = X.mean(), X.std()
-            x_min, x_max = X.min(), X.max()
-            text1 = f"x_mean: {x_mean*.1:.1f} cm, x_std: {x_std*.1:.1f} cm"
-            text1 += f"(min, max): ({x_min*.1:.1f}, {x_max*.1:.1f}) cm"
+            x_mean, x_std = X.mean()*10, X.std()*10
+            x_min, x_max = X.min()*10, X.max()*10
+            text1 = f"x_mean: {x_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, x_std: {x_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
+            text1 += f"(min, max): ({x_min*.1:.1f}, {x_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
             axe.text(0, ymax*.98,
-                     fr"mean$_x$: {x_mean*.1:.1f} cm, $\sigma_x$: {x_std*.1:.1f} cm, " +
-                     fr"(x$_{{min}}$, $x_{{max}}$): ({x_min*.1:.1f}, {x_max*.1:.1f}) cm"+ "\n" + text2,
+                     fr"mean$_x$: {x_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_x$: {x_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
+                     fr"(x$_{{min}}$, $x_{{max}}$): ({x_min*.1:.1f}, {x_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
                      va='top', ha ='left', fontsize=9, bbox=box)
         axe.legend()
         axe.grid(True)
 
         axe = axes[1]
-        axe.set_ylim(-Plot_IMU.TYPE_INFO[self.type_info][5], Plot_IMU.TYPE_INFO[self.type_info][5])
+        axe.set_ylim(-ymax, ymax)
         axe.plot(T, Y, '.:b', markersize=marker_size, linewidth=0.3, color='g', label=f"{Plot_IMU.TYPE_INFO[self.type_info][2]} {self.type_info}")
         axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][2]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            y_mean, y_std = Y.mean(), Y.std()
-            y_min, y_max = Y.min(), Y.max()
-            text1 = f"y_mean: {y_mean*.1:.1f} cm, y_std: {y_std*.1:.1f} cm"
-            text1 += f"(min, max): ({y_min*.1:.1f}, {y_max*.1:.1f}) cm"
+            y_mean, y_std = Y.mean()*10, Y.std()*10
+            y_min, y_max = Y.min()*10, Y.max()*10
+            text1 = f"y_mean: {y_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, y_std: {y_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
+            text1 += f"(min, max): ({y_min*.1:.1f}, {y_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
             axe.text(0, ymax*.98,
-                     fr"mean$_y$: {y_mean*.1:.1f} cm, $\sigma_y$: {y_std*.1:.1f} cm, " +
-                     fr"(y$_{{min}}$, $y_{{max}}$): ({y_min*.1:.1f}, {y_max*.1:.1f}) cm"+ "\n" + text2,
+                     fr"mean$_y$: {y_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_y$: {y_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
+                     fr"(y$_{{min}}$, $y_{{max}}$): ({y_min*.1:.1f}, {y_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
                      va='top', ha ='left', fontsize=9, bbox=box)
         axe.legend()
         axe.grid(True)
 
         axe = axes[2]
-        axe.set_ylim(-Plot_IMU.TYPE_INFO[self.type_info][5], Plot_IMU.TYPE_INFO[self.type_info][5])
+        axe.set_ylim(-ymax, ymax)
         axe.plot(T, Z, '.:b', markersize=marker_size, linewidth=0.3, color='b', label=f"{Plot_IMU.TYPE_INFO[self.type_info][3]} {self.type_info}")
         axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][3]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            z_mean, z_std = Z.mean(), Z.std()
-            z_min, z_max = Z.min(), Z.max()
-            text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-            text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+            z_mean, z_std = Z.mean()*10, Z.std()*10
+            z_min, z_max = Z.min()*10, Z.max()*10
+            text1 = f"z_mean: {z_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, z_std: {z_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
+            text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
             axe.text(0, ymax*.98,
-                     fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                     fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
+                     fr"mean$_z$: {z_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_z$: {z_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
+                     fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
                      va='top', ha ='left', fontsize=9, bbox=box)
         axe.legend()
         axe.grid(True)
