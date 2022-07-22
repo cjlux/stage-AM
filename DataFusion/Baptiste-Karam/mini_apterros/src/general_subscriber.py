@@ -5,7 +5,8 @@ from std_msgs.msg import String
 from geometry_msgs.msg import QuaternionStamped
 import message_filters
 from scipy.spatial.transform import Rotation
-from math import radians, cos
+from math import cos, sin
+import numpy as np
 
 class miniapterros_listner:
     ''' This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
@@ -49,7 +50,10 @@ class miniapterros_listner:
         '''
         self.parsing_iidre(data_iidre)
         self.parsing_mti(data_mti)
-        self.parsing_lidar(data_lidar, data_mti)
+        self.parsing_lidar(data_lidar)
+        psi = data_mti.quaternion[0]
+        theta = data_mti.quaternion[1]
+        phi = data_mti.quaternion[2]
 
         if self.verbose:
             rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", str(data_iidre.data), str(data_lidar.data), str(data_mti.quaternion))
@@ -57,32 +61,40 @@ class miniapterros_listner:
         self.log_file.write("Time: "+str(data_mti.header)+"\n")
         self.log_file.write("DATA_IIDRE :"+ str(data_iidre.data[0])+","+str(data_iidre.data[1])+"\n")
         self.log_file.write("DATA_LiDAR :"+ str(data_lidar.data)+"\n")
-        self.log_file.write("DATA_MTi-30 :"+str(radians(data_mti.quaternion[0]))+","+str(radians(data_mti.quaternion[1]))+","+str(radians(data_mti.quaternion[2]))+"\n"+"\n")
+        self.log_file.write("DATA_MTi-30 :"+str(psi)+","+str(theta)+","+str(phi)+"\n")
+
+        matrix_roll = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
+        matrix_pitch = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
+        matrix_yaw = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
+
+        matrix_euler = np.dot(matrix_roll, matrix_pitch)
+        matrix_euler = np.dot(matrix_euler, matrix_yaw)
+        matrix_xyz = np.matrix([[float(data_iidre.data[0])], [float(data_iidre.data[1])], [data_lidar.data]])
+
+        matrix_new = np.dot(matrix_euler, matrix_xyz)
+
+        self.log_file.write("Nouvelles coordonnées :"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2])+"\n"+"\n")
+        
 
     def parsing_iidre(self, data_iidre):
-        '''This enables to only take the relevant information of the message it hears.
-           So, it splits the information at each ':' to first see if the information is about
-           the distance between each anchor and the tag or the position of the tag.
-           Then, it reduces the size of the data to only write in the file the information we want.
+        ''' This enables to only take the relevant information of the message it hears.
+            So, it splits the information at each ':' to first see if the information is about
+            the distance between each anchor and the tag or the position of the tag.
+            Then, it reduces the size of the data to only write in the file the information we want.
         '''
         fb = data_iidre.data.split(":")
         fb_cmd = fb[0]
         fb_data = fb[1].split(",")
-        time = fb_data[0]
 
-        if fb_cmd == "+MPOS":
-            # This is usable if device has been preconfigured with the uwbSupervisor
-            # Convert from centimeters (in the JSON infra file) to meters
-            data_iidre.data = [fb_data[1], fb_data[2]]
+        data_iidre.data = [fb_data[1], fb_data[2]]
 
-    def parsing_lidar(self, data_lidar, data_mti):
-        '''It splits data at each ',' and takes the second part of data
-           which corresponds to the distance measured by LiDAR and corrected
-           by the angle calculate by the MTi-30
+    def parsing_lidar(self, data_lidar):
+        ''' It splits data at each ',' and takes the second part of data
+            which corresponds to the distance measured by LiDAR 
         '''
         fb = data_lidar.data.split(",")
         data_lidar.data = fb[1]
-        data_lidar.data = int(data_lidar.data) * cos(radians(data_mti.quaternion[0])) * cos(radians(data_mti.quaternion[1]))
+        data_lidar.data = int(float(data_lidar.data))
 
     def parsing_mti(self, data_mti):
         ''' This function receives data as argument.
@@ -95,10 +107,9 @@ class miniapterros_listner:
         data_mti.quaternion = str(data_mti.quaternion).replace("\n", ":")       # Replace the \n by : in the str
         fb_data_mti = data_mti.quaternion.split(":")                            # Récupère les accelerations selon x, y et z
         data_mti.quaternion = [fb_data_mti[1],fb_data_mti[3],fb_data_mti[5],fb_data_mti[7]]
-        
         # Transformation quaternion to Euler
         data_mti.quaternion = Rotation.from_quat(data_mti.quaternion)
-        data_mti.quaternion = data_mti.quaternion.as_euler('xyz', degrees=True)
+        data_mti.quaternion = data_mti.quaternion.as_euler('xyz')
         
 if __name__ == '__main__':
 

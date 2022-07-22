@@ -1,0 +1,7 @@
+<launch>
+    <arg name="mode" default="HIGH_SPEED"/>
+    
+    <node name="publisher_lidar" pkg="lidar_vl53l4cd" type="publisher_lidar.py" output="screen">
+           <param name="lidar_mode" value="$(arg mode)" />
+    </node>
+</launch>
