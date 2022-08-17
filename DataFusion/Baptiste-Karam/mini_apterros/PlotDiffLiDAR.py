@@ -43,7 +43,8 @@ if __name__ == '__main__':
     print(f"Opening log file <{data_file}>...")
 
     data_brut = []
-    data_traite = []
+    data_traite_quaternion = []
+    data_traite_euler = []
     time = []
 
     with open(data_file, "r", encoding="utf8") as F:
@@ -55,10 +56,14 @@ if __name__ == '__main__':
 
             if fb_cmd == "DATA_LiDAR ":
                 data_brut.append(int(fb[1].replace(" ", "")))
-            elif fb_cmd == "Nouvelles coordonnées ":
+            elif fb_cmd == "Nouvelles coordonnées - quaternion":
                 height = fb[1].split("[")
                 real_height = height[6]
-                data_traite.append(float(real_height.replace("]", "")))
+                data_traite_quaternion.append(float(real_height.replace("]", "")))
+            elif fb_cmd == "Nouvelles coordonnées - euler":
+                height = fb[1].split("[")
+                real_height = height[6]
+                data_traite_euler.append(float(real_height.replace("]", "")))
             elif fb_cmd == "Time":
                 time.append(float(fb[1].replace(" ", "")))
 
@@ -66,7 +71,8 @@ if __name__ == '__main__':
                 continue   # skip comment lines
 
     data_brut = np.array(data_brut)
-    data_traite = np.array(data_traite)
+    data_traite_quaternion = np.array(data_traite_quaternion)
+    data_traite_euler = np.array(data_traite_euler)
     data_moy = (data_brut+data_traite)/2
     time = np.array(time)
 
@@ -111,14 +117,14 @@ if __name__ == '__main__':
 
     # axe = axes[1]
     # axe.set_title("Z (ground distance in the direction of the LiDAR sight corrected by the MTi's data)")
-    # axe.plot(time, data_traite, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
+    # axe.plot(time, data_traite_quaternion, '.:b', markersize=marker_size, linewidth=0.3, label="Z")
     # axe.set_ylabel("distance [mm]")
     # axe.set_xlabel(x_label)
     # ymax = 1300
     # axe.set_ylim(0, ymax)
     # if stat:
-    #     z_mean, z_std = data_traite.mean(), data_traite.std()
-    #     z_min, z_max = data_traite.min(), data_traite.max()
+    #     z_mean, z_std = data_traite_quaternion.mean(), data_traite_quaternion.std()
+    #     z_min, z_max = data_traite_quaternion.min(), data_traite_quaternion.max()
     #     text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
     #     text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
     #     text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
@@ -142,8 +148,8 @@ if __name__ == '__main__':
     marker_size = 5 if len(data_brut) <= 30 else 1
     axe.set_title("Z (ground distance in the direction of the LiDAR sight and corrected by the MTi's data)")
     axe.plot(time, data_brut, '.:b', markersize=marker_size, linewidth=0.3, label="Z LiDAR")
-    axe.plot(time, data_traite, '.:r', markersize=marker_size, linewidth=0.3, label="Z real")
-    axe.plot(time, data_moy, '.:g', markersize=marker_size, linewidth=0.3, label="Z mean")
+    axe.plot(time, data_traite_quaternion, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - quaternion")
+    axe.plot(time, data_traite_euler, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - euler")
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     ymax = 1300
@@ -162,8 +168,8 @@ if __name__ == '__main__':
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box_original)
 
-        z_mean, z_std = data_traite.mean(), data_traite.std()
-        z_min, z_max = data_traite.min(), data_traite.max()
+        z_mean, z_std = data_traite_quaternion.mean(), data_traite_quaternion.std()
+        z_min, z_max = data_traite_quaternion.min(), data_traite_quaternion.max()
         text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
         text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
         text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
@@ -175,8 +181,8 @@ if __name__ == '__main__':
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box_new)
 
-        z_mean, z_std = data_moy.mean(), data_moy.std()
-        z_min, z_max = data_moy.min(), data_moy.max()
+        z_mean, z_std = data_traite_euler.mean(), data_traite_euler.std()
+        z_min, z_max = data_traite_euler.min(), data_traite_euler.max()
         text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
         text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
         text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"

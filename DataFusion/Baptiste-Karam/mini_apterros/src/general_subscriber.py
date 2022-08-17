@@ -69,6 +69,12 @@ class miniapterros_listner:
         self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+str(data_mti.quaternion[1])+","+str(data_mti.quaternion[2])+","+str(data_mti.quaternion[3])+"\n")
         self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+str(data_mti_euler[1])+","+str(data_mti_euler[2])+"\n")
 
+        #Fusion des données du LiDAR et de la MTi-30
+
+        #Quaternion
+        height_quaternion = data_mti.quaternion*data_lidar.data*numpy.conj(data_mti.quaternion)
+
+        #Euler
         matrix_roll = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
         matrix_pitch = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
         matrix_yaw = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
@@ -79,7 +85,8 @@ class miniapterros_listner:
 
         matrix_new = np.dot(matrix_euler, matrix_xyz)
 
-        self.log_file.write("Nouvelles coordonnées :"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2])+"\n"+"\n")
+        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(height_quaternion)+"\n"+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2])+"\n"+"\n")
 
 
     def parsing_iidre(self, data_iidre):
