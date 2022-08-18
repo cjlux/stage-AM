@@ -44,8 +44,7 @@ if __name__ == '__main__':
 
     data_brut = []
     data_traite_quaternion = []
-    data_traite_euler_1 = []
-    data_traite_euler_2 = []
+    data_traite_euler = []
     time = []
 
     with open(data_file, "r", encoding="utf8") as F:
@@ -55,20 +54,16 @@ if __name__ == '__main__':
             fb = alt.split(":")
             fb_cmd = fb[0]
 
-            if fb_cmd == "DATA_LiDAR ":
+            if fb_cmd == "DATA_LiDAR":
                 data_brut.append(int(fb[1].replace(" ", "")))
             elif fb_cmd == "Nouvelles coordonnées - quaternion":
-                height = fb[1].split("[")
-                real_height = height[6]
-                data_traite_quaternion.append(float(real_height.replace("]", "")))
-            elif fb_cmd == "Nouvelles coordonnées - euler 1/2":
-                height = fb[1].split("[")
-                real_height = height[6]
-                data_traite_euler_1.append(float(real_height.replace("]", "")))
-            elif fb_cmd == "Nouvelles coordonnées - euler 2/2":
-                height = fb[1].split("[")
-                real_height = height[6]
-                data_traite_euler_2.append(float(real_height.replace("]", "")))
+                values = fb[1].split(",")
+                real_height = values[-1]
+                data_traite_quaternion.append(float(real_height))
+            elif fb_cmd == "Nouvelles coordonnées - euler":
+                values = fb[1].split(",")
+                real_height = values[-1]
+                data_traite_euler.append(float(real_height))
             elif fb_cmd == "Time":
                 time.append(float(fb[1].replace(" ", "")))
 
@@ -77,9 +72,7 @@ if __name__ == '__main__':
 
     data_brut = np.array(data_brut)
     data_traite_quaternion = np.array(data_traite_quaternion)
-    data_traite_euler_1 = np.array(data_traite_euler_1)
-    data_traite_euler_2 = np.array(data_traite_euler_2)
-    data_moy = (data_brut+data_traite)/2
+    data_traite_euler = np.array(data_traite_euler)
     time = np.array(time)
 
     dt_array = time[1:]-time[:-1]
@@ -155,8 +148,7 @@ if __name__ == '__main__':
     axe.set_title("Z (ground distance in the direction of the LiDAR sight and corrected by the MTi's data)")
     axe.plot(time, data_brut, '.:b', markersize=marker_size, linewidth=0.3, label="Z LiDAR")
     axe.plot(time, data_traite_quaternion, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - quaternion")
-    axe.plot(time, data_traite_euler, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - euler 1/2")
-    axe.plot(time, data_traite_euler, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - euler 2/2")
+    axe.plot(time, data_traite_euler, '.:g', markersize=marker_size, linewidth=0.3, label="Z real - euler")
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     ymax = 1300
@@ -188,27 +180,14 @@ if __name__ == '__main__':
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box_new)
 
-        z_mean, z_std = data_traite_euler_1.mean(), data_traite_euler_1.std()
-        z_min, z_max = data_traite_euler_1.min(), data_traite_euler_1.max()
+        z_mean, z_std = data_traite_euler.mean(), data_traite_euler.std()
+        z_min, z_max = data_traite_euler.min(), data_traite_euler.max()
         text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
         text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
         text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1)
         print(text2)
         box_mean = {'facecolor': (.8,.9,.8,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
-        axe.text(0, ymax*.72,
-                 fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box_mean)
-
-        z_mean, z_std = data_traite_euler_2.mean(), data_traite_euler_2.std()
-        z_min, z_max = data_traite_euler_2.min(), data_traite_euler_2.max()
-        text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-        text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
-        text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
-        print(text1)
-        print(text2)
-        box_mean = {'facecolor': (.8,.9,.8,.5) , 'edgecolor':'black', 'boxstyle': 'square'}
         axe.text(0, ymax*.72,
                  fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,

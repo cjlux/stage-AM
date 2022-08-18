@@ -56,9 +56,9 @@ class miniapterros_listner:
             rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", str(data_iidre.data), str(data_lidar.data), str(data_mti.quaternion))
 
         # Transformation quaternion to Euler
-        data_mti_euler[]
+        data_mti_euler = []
         data_mti_euler = Rotation.from_quat(data_mti.quaternion)
-        data_mti_euler = euler.as_euler('xyz')
+        data_mti_euler = data_mti_euler.as_euler('xyz')
         psi = data_mti_euler[0]
         theta = data_mti_euler[1]
         phi = data_mti_euler[2]
@@ -72,32 +72,26 @@ class miniapterros_listner:
         #Fusion des données du LiDAR et de la MTi-30
 
         #Quaternion
-        height_quaternion = data_mti.quaternion*data_lidar.data*numpy.conj(data_mti.quaternion)
+        matrix_u = np.matrix([[0], [float(data_iidre.data[0])], [float(data_iidre.data[1])], [float(data_lidar.data)]])
+        data_mti.quaternion = np.array(data_mti.quaternion,dtype=float)
+        quaternion_conj = np.matrix([data_mti.quaternion[0],-data_mti.quaternion[1],-data_mti.quaternion[2],-data_mti.quaternion[3]])
+        height_quaternion = np.dot(quaternion_conj,matrix_u)
+        height_quaternion = np.dot(height_quaternion,np.matrix(data_mti.quaternion))
 
-        #Euler 1/2
-        matrix_roll_1 = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
-        matrix_pitch_1 = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
-        matrix_yaw_1 = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
+        #Euler
+        matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data]])
 
-        matrix_euler_1 = np.dot(matrix_roll_1, matrix_pitch_1)
-        matrix_euler_1 = np.dot(matrix_euler_1, matrix_yaw_1)
-        matrix_xyz = np.matrix([[float(data_iidre.data[0])], [float(data_iidre.data[1])], [data_lidar.data]])
+        matrix_roll = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
+        matrix_pitch = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
+        matrix_yaw = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
 
-        matrix_new_1 = np.dot(matrix_euler_1, matrix_xyz)
+        matrix_euler = np.dot(matrix_roll, matrix_pitch)
+        matrix_euler = np.dot(matrix_euler, matrix_yaw)
 
-        #Euler 2/2
-        matrix_roll_2 = [[cos(psi), -sin(psi), 0],[sin(psi), cos(psi), 0], [0, 0, 1]]
-        matrix_pitch_2 = [[1, 0, 0],[0, cos(theta), -sin(theta)],[0, sin(theta), cos(theta)]]
-        matrix_yaw_2 = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
+        matrix_new = np.dot(matrix_euler, matrix_xyz)
 
-        matrix_euler_2 = np.dot(matrix_roll_2, matrix_pitch_2)
-        matrix_euler_2 = np.dot(matrix_euler_2, matrix_yaw_2)
-
-        matrix_new_2 = np.dot(matrix_euler_2, matrix_xyz)
-
-        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(height_quaternion)+"\n"+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler 1/2:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new_1[2])+"\n"+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler 2/2:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new_2[2])+"\n"+"\n")
+        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(-height_quaternion[0,3])+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n")
 
 
     def parsing_iidre(self, data_iidre):
