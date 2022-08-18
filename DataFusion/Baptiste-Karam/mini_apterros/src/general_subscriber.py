@@ -46,7 +46,10 @@ class miniapterros_listner:
                 Time
                 IIDRE_DATA
                 LiDAR_DATA
-                MTi_DATA
+                MTi_DATA (quaternion and Euler angles)
+
+                New_treated_coordinates (using quaternion)
+                New_treated_coordinates (using angles of Euler)
         '''
         self.parsing_iidre(data_iidre)
         self.parsing_mti(data_mti)
