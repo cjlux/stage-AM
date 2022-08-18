@@ -7,12 +7,12 @@ from std_msgs.msg import String
 class iidre_listner:
     '''This class allows to get the information published by the publisher of IIDRE
        and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
-       registered in the tree where the code is executed.
+       registered in the directory where the code is executed.
     '''
     def __init__(self, opened_log_file, verbose=False):
         '''Parameters :
-                opened_log_file : the file where the data are stored
-                verbose : define if there will be messages printed in the terminal
+             opened_log_file : the file where the data are stored
+             verbose : define if there will be messages printed in the terminal
            Functions :
            rospy.Subscriber takes in parameters : the topic on which it is registered
            as a subscriber, the given type of the messages and a function to write what it hears.
@@ -20,21 +20,21 @@ class iidre_listner:
         self.verbose = verbose
         self.log_file = opened_log_file
         self.subscriber = rospy.Subscriber("/iidre_position", String, self.callback)
-        print("instance of iidre_listen created...")
+        print("instance of 'iidre_listner' created...")
 
     def callback(self, data):
-        '''It first calls the function parsing to only consider the relevant information
-           of the message. Then, it writes a message in rospy.loginfo about the data
-           it hears (when the verbose variable is set to True). Then, it writes the
-           data in the file.
+        '''Calls the method 'parsing' to filter the relevant information in the data of the topic. 
+           If verbose, writes a message in rospy.loginfo about the data it hears.
+           Finaly writes the data in the file.
         '''
         # self.parsing(data)
-        if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+        if self.verbose: 
+           rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
         self.log_file.write(str(data.data)+"\n")
 
     def parsing(self, data):
-        '''This enables to only take the relevant information of the message it hears.
-           So, it splits the information at each ':' to first see when the information is about
+        '''Filter the data to take only the relevant information of the message it hears.
+           Splits the information at each ':' to first see when the information is about
            the position of the tag.
            Then, it reduces the size of the data to only write in the file the information we want.
         '''
@@ -68,3 +68,4 @@ if __name__ == '__main__':
 
         # spin() simply keeps python from exiting until this node is stopped
         rospy.spin()
+        
