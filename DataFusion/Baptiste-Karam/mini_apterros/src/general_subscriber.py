@@ -74,19 +74,30 @@ class miniapterros_listner:
         #Quaternion
         height_quaternion = data_mti.quaternion*data_lidar.data*numpy.conj(data_mti.quaternion)
 
-        #Euler
-        matrix_roll = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
-        matrix_pitch = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
-        matrix_yaw = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
+        #Euler 1/2
+        matrix_roll_1 = [[1, 0, 0],[0, cos(psi), -sin(psi)],[0, sin(psi), cos(psi)]]
+        matrix_pitch_1 = [[cos(theta), 0, sin(theta)],[0, 1, 0],[-sin(theta), 0, cos(theta)]]
+        matrix_yaw_1 = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
 
-        matrix_euler = np.dot(matrix_roll, matrix_pitch)
-        matrix_euler = np.dot(matrix_euler, matrix_yaw)
+        matrix_euler_1 = np.dot(matrix_roll_1, matrix_pitch_1)
+        matrix_euler_1 = np.dot(matrix_euler_1, matrix_yaw_1)
         matrix_xyz = np.matrix([[float(data_iidre.data[0])], [float(data_iidre.data[1])], [data_lidar.data]])
 
-        matrix_new = np.dot(matrix_euler, matrix_xyz)
+        matrix_new_1 = np.dot(matrix_euler_1, matrix_xyz)
+
+        #Euler 2/2
+        matrix_roll_2 = [[cos(psi), -sin(psi), 0],[sin(psi), cos(psi), 0], [0, 0, 1]]
+        matrix_pitch_2 = [[1, 0, 0],[0, cos(theta), -sin(theta)],[0, sin(theta), cos(theta)]]
+        matrix_yaw_2 = [[cos(phi), -sin(phi), 0],[sin(phi), cos(phi), 0],[0, 0, 1]]
+
+        matrix_euler_2 = np.dot(matrix_roll_2, matrix_pitch_2)
+        matrix_euler_2 = np.dot(matrix_euler_2, matrix_yaw_2)
+
+        matrix_new_2 = np.dot(matrix_euler_2, matrix_xyz)
 
         self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(height_quaternion)+"\n"+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2])+"\n"+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler 1/2:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new_1[2])+"\n"+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler 2/2:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new_2[2])+"\n"+"\n")
 
 
     def parsing_iidre(self, data_iidre):
