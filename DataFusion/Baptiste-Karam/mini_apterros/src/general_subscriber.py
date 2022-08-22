@@ -94,7 +94,7 @@ class miniapterros_listner:
         matrix_new = np.dot(matrix_euler, matrix_xyz)
 
         self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(-height_quaternion[0,3])+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n"+"\n")
 
 
     def parsing_iidre(self, data_iidre):
