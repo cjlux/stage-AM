@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
 
-import time, sys
+import time, sys, argparse
 import rospy
 from std_msgs.msg import String
 
 class iidre_listner:
-    '''This class allows to get the information published by the publisher of IIDRE
-       and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
-       registered in the directory where the code is executed.
+    '''
+    This class allows to get the information published by the publisher of IIDRE
+     and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+    registered in the directory where the code is executed.
     '''
     def __init__(self, opened_log_file, verbose=False):
-        '''Parameters :
-             opened_log_file : the file where the data are stored
-             verbose : define if there will be messages printed in the terminal
-           Functions :
-           rospy.Subscriber takes in parameters : the topic on which it is registered
-           as a subscriber, the given type of the messages and a function to write what it hears.
+        '''
+        Parameters :
+          opened_log_file : the file where the data are stored
+          verbose : define if there will be messages printed in the terminal
+        
+        Functions :
+        rospy.Subscriber takes in parameters : the topic on which it is registered
+        as a subscriber, the given type of the messages and a function to write what it hears.
         '''
         self.verbose = verbose
         self.log_file = opened_log_file
@@ -23,9 +26,10 @@ class iidre_listner:
         print("instance of 'iidre_listner' created...")
 
     def callback(self, data):
-        '''Calls the method 'parsing' to filter the relevant information in the data of the topic. 
-           If verbose, writes a message in rospy.loginfo about the data it hears.
-           Finaly writes the data in the file.
+        '''
+        Calls the method 'parsing' to filter the relevant information in the data of the topic. 
+        If verbose, writes a message in rospy.loginfo about the data it hears.
+        Finaly writes the data in the file.
         '''
         # self.parsing(data)
         if self.verbose: 
@@ -33,10 +37,11 @@ class iidre_listner:
         self.log_file.write(str(data.data)+"\n")
 
     def parsing(self, data):
-        '''Filter the data to take only the relevant information of the message it hears.
-           Splits the information at each ':' to first see when the information is about
-           the position of the tag.
-           Then, it reduces the size of the data to only write in the file the information we want.
+        '''
+        Filter the data to take only the relevant information of the message it hears.
+        Splits the information at each ':' to first see when the information is about
+        the position of the tag.
+        Then, it reduces the size of the data to only write in the file the information we want.
         '''
         fb = data.data.split(":")
         fb_cmd = fb[0]
@@ -50,9 +55,19 @@ class iidre_listner:
 
 if __name__ == '__main__':
 
-   import time
+   import time, sys
 
-   uniq_file_name = f"./Data_iidre_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--file_prefix", type=str, default="")
+   parser.add_argument("--duration", type=int, default=0)
+   args = parser.parse_args()
+   file_prefix = args.file_prefix
+   duration = args.duration
+
+   uniq_file_name = f"./Data_iidre_"
+   if file_prefix != "":
+      uniq_file_name += f"{file_prefix}_"
+   uniq_file_name += f"{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 
    with open(uniq_file_name, "w") as f:
@@ -67,5 +82,8 @@ if __name__ == '__main__':
         rospy.init_node('iidre_listener', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()
+        if duration:
+            rospy.sleep(duration)
+        else:
+            rospy.spin()
         
