@@ -9,21 +9,23 @@ from math import cos, sin
 import numpy as np
 
 class miniapterros_listner:
-    ''' This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
-        and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
-        registered in the tree where the code is executed.
+    ''' 
+    This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
+    and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+    registered in the tree where the code is executed.
     '''
     def __init__(self, log_file, verbose=False):
-        '''Parameters :
-                log_file : the file where the data are stored
-                verbose : define if there will be messages printed in the terminal
-           Functions :
-                message_filters.Subscriber takes in parameters : the topic on which it is registered
-                as a subscriber and the given type of the messages.
+        '''
+        Parameters :
+          log_file : the file where the data are stored
+          verbose : define if there will be messages printed in the terminal
+        Functions :
+          message_filters.Subscriber takes in parameters : the topic on which it is registered
+          as a subscriber and the given type of the messages.
 
-                message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
-                queue size, time interval for time synchronization and a parameter that allow the access to different
-                headers in order to have the TimeStamped for each sensor.
+          message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
+          queue size, time interval for time synchronization and a parameter that allow the access to different
+          headers in order to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
         self.log_file = log_file
