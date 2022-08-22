@@ -131,6 +131,7 @@ class miniapterros_listner:
 
 if __name__ == '__main__':
 
+   parser.add_argument("--duration", type=int, default=0)
    uniq_file_name = f"./Data_fusion_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 

@@ -51,6 +51,7 @@ class xsens_mti_listener:
 
 if __name__ == '__main__':
 
+   parser.add_argument("--duration", type=int, default=0)
    import time
 
    uniq_file_name = f"./Data_MTi_angular_velocity_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
