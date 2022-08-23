@@ -23,9 +23,16 @@ class miniapterros_listner:
           message_filters.Subscriber takes in parameters : the topic on which it is registered
           as a subscriber and the given type of the messages.
 
-          message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
-          queue size, time interval for time synchronization and a parameter that allow the access to different
-          headers in order to have the TimeStamped for each sensor.
+          message_filters.ApproximateTimeSynchronizer() synchronizes messages by their timestamp,
+          only pass them through when all have arrived
+
+          Parameters :
+              a list of multiple subscribers,
+              queue size : sets of messages should be stored from each input filter
+                           (by timestamp) while waiting for all messages to arrive,
+              slop : delay in secondes with which messages can be synchronized, 
+              allow_headerless : allow the access to different headers in order 
+                                 to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
         self.log_file = log_file
@@ -35,13 +42,15 @@ class miniapterros_listner:
         self.subscriber_mti = message_filters.Subscriber("/filter/quaternion", QuaternionStamped)
         print("instance of MiniApterros created ...")
         
-        # TODO Karam: commenterla ligne ci-dessous:
+
         self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre, 
                                                                 self.subscriber_lidar, 
                                                                 self.subscriber_mti],
                                                                 queue_size = 10, 
                                                                 slop = 1, 
                                                                 allow_headerless=True)
+        
+        
         self.tss.registerCallback(self.callback)
 
 
