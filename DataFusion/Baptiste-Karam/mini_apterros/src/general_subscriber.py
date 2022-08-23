@@ -9,21 +9,23 @@ from math import cos, sin
 import numpy as np
 
 class miniapterros_listner:
-    ''' This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
-        and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
-        registered in the tree where the code is executed.
+    ''' 
+    This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
+    and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+    registered in the tree where the code is executed.
     '''
     def __init__(self, log_file, verbose=False):
-        '''Parameters :
-                log_file : the file where the data are stored
-                verbose : define if there will be messages printed in the terminal
-           Functions :
-                message_filters.Subscriber takes in parameters : the topic on which it is registered
-                as a subscriber and the given type of the messages.
+        '''
+        Parameters :
+          log_file : the file where the data are stored
+          verbose : define if there will be messages printed in the terminal
+        Functions :
+          message_filters.Subscriber takes in parameters : the topic on which it is registered
+          as a subscriber and the given type of the messages.
 
-                message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
-                queue size, time interval for time synchronization and a parameter that allow the access to different
-                headers in order to have the TimeStamped for each sensor.
+          message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
+          queue size, time interval for time synchronization and a parameter that allow the access to different
+          headers in order to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
         self.log_file = log_file
@@ -32,24 +34,31 @@ class miniapterros_listner:
         self.subscriber_lidar = message_filters.Subscriber("/lidar_height", String)
         self.subscriber_mti = message_filters.Subscriber("/filter/quaternion", QuaternionStamped)
         print("instance of MiniApterros created ...")
-
-        self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre, self.subscriber_lidar, self.subscriber_mti],queue_size = 10, slop = 1, allow_headerless=True)
+        
+        # TODO Karam: commenterla ligne ci-dessous:
+        self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre, 
+                                                                self.subscriber_lidar, 
+                                                                self.subscriber_mti],
+                                                                queue_size = 10, 
+                                                                slop = 1, 
+                                                                allow_headerless=True)
         self.tss.registerCallback(self.callback)
 
 
     def callback(self, data_iidre, data_lidar, data_mti):
-        '''It calls 3 parsing() function for the sensors to keep just data we need.
-           It contains a conversion function to get euler angles from quaternion.
-           Then, it  writes a message in rospy.loginfo about the data
-           it hears (when the verbose variable is set to True).
-           Then, it writes the data in the file in blocs :
-                Time
-                IIDRE_DATA
-                LiDAR_DATA
-                MTi_DATA (quaternion and Euler angles)
+        '''
+        It calls 3 parsing() function for the sensors to keep just data we need.
+        It contains a conversion function to get euler angles from quaternion.
+        Then, it  writes a message in rospy.loginfo about the data
+        it hears (when the verbose variable is set to True).
+        Then, it writes the data in the file in blocs :
+             Time
+             IIDRE_DATA
+             LiDAR_DATA
+             MTi_DATA (quaternion and Euler angles)
 
-                New_treated_coordinates (using quaternion)
-                New_treated_coordinates (using angles of Euler)
+             New_treated_coordinates (using quaternion)
+             New_treated_coordinates (using angles of Euler)
         '''
         self.parsing_iidre(data_iidre)
         self.parsing_mti(data_mti)
@@ -98,10 +107,11 @@ class miniapterros_listner:
 
 
     def parsing_iidre(self, data_iidre):
-        ''' This enables to only take the relevant information of the message it hears.
-            So, it splits the information at each ':' to first see if the information is about
-            the distance between each anchor and the tag or the position of the tag.
-            Then, it reduces the size of the data to only write in the file the information we want.
+        ''' 
+        This enables to only take the relevant information of the message it hears.
+        So, it splits the information at each ':' to first see if the information is about
+        the distance between each anchor and the tag or the position of the tag.
+        Then, it reduces the size of the data to only write in the file the information we want.
         '''
         fb = data_iidre.data.split(":")
         fb_cmd = fb[0]
@@ -110,17 +120,19 @@ class miniapterros_listner:
         data_iidre.data = [fb_data[1], fb_data[2]]
 
     def parsing_lidar(self, data_lidar):
-        ''' It splits data at each ',' and takes the second part of data
-            which corresponds to the distance measured by LiDAR
+        ''' 
+        Splits data at each ',' and takes the second part of data
+        which corresponds to the distance measured by LiDAR
         '''
         fb = data_lidar.data.split(",")
         data_lidar.data = fb[1]
         data_lidar.data = int(float(data_lidar.data))
 
     def parsing_mti(self, data_mti):
-        ''' This function receives data as argument.
-            It splits data to get only time and the quaternion
+        ''' 
+        Receives data as argument: splits data to get only time and the quaternions.
         '''
+        # concatenate all the lines:
         data_mti.header = str(data_mti.header).replace("\n", ":")
         tmp_data_mti = data_mti.header.split(":")
         data_mti.header = float(tmp_data_mti[5]) + int(tmp_data_mti[7]) * 1e-9

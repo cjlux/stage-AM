@@ -5,15 +5,18 @@ import rospy
 from std_msgs.msg import String
 
 class LiDAR_listener:
-    '''This class reads the information published by the LIDAR publisher and stores the
-       data in the file ./Data_LiDAR_<prefix>_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+    '''
+    This class reads the information published by the LIDAR publisher and stores the
+    data in the file ./Data_LiDAR_<prefix>_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
     '''
     def __init__(self, opened_log_file, duration=None, verbose=False):
-        '''Parameters:
-             opened_log_file: the file where the data are stored
-             duration: duration of the algorithm's execution
-             verbose: define if there will be messages printed in the terminal
-           Functions:
+        '''
+        Parameters:
+          opened_log_file: the file where the data are stored
+          duration: duration of the algorithm's execution
+          verbose: define if there will be messages printed in the terminal
+        
+        Functions:
            rospy.Subscriber takes in parameters: the topic on which it is registered
            as a subscriber, the type of the messages and a function to write the data it reads.
            The current time is also collected to apply the duration you want.
@@ -24,9 +27,9 @@ class LiDAR_listener:
         print("instance of LiDAR_listen created...")
 
     def callback(self, data):
-        '''Write a message in rospy.loginfo about the data it gets 
-           (when the verbose variable is set to True). 
-           Then, it writes the data in the file.
+        '''
+        Write a message in rospy.loginfo about the data it gets  (when the verbose 
+        variable is set to True). Then, it writes the data in the file.
         '''
         # self.parsing(data)
         if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)

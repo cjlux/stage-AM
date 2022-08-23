@@ -11,25 +11,28 @@ import busio
 import adafruit_vl53l4cd
 
 class LiDAR_publisher(object):
-    '''This class allows to publish the data got by LiDAR on a specific topic.
+    '''
+    This class allows to publish the data got by LiDAR on a specific topic.
     '''
 
-    LIDAR_MODE =  {'GOOD_ACCURACY': 33,
-                   'BEST_ACCURACY': 200,
-                   'HIGH_SPEED': 20}
+    LIDAR_MODE = {'GOOD_ACCURACY': 33,
+                  'BEST_ACCURACY': 200,
+                  'HIGH_SPEED': 20}
 
     def __init__(self, mode):
-        '''Parameters:
-             mode:str: the lidar mode, see allowed values in LIDAR_MODE.
+        '''
+        Parameters:
+           mode:str: the lidar mode, see allowed values in LIDAR_MODE.
         '''
         rospy.init_node("publisher_lidar")
         self.mode = mode
-        self.topic_name = rospy.Publisher('lidar_height', String, queue_size=10)
+        self.publisher = rospy.Publisher('lidar_height', String, queue_size=10)
 
     def run(self):
-        '''Enter in an infinite loop to read data on the I2C bus,
-           pre-process the string and calls the publish method.
-           Nota Bene : The data rate imposed by the LiDAR mode.
+        '''
+        Enter in an infinite loop to read data on the I2C bus,
+        pre-process the string and calls the publish method.
+        Nota: The data rate imposed by the LiDAR mode.
         '''
         # Initialize I2C bus and sensor.
         i2c = busio.I2C(board.SCL, board.SDA)
@@ -50,9 +53,10 @@ class LiDAR_publisher(object):
                 rospy.loginfo("Error when parsing a frame from serial")
 
     def publish(self, tof):
-        '''Publish the data on the topic
         '''
-        self.topic_name.publish("{},{}".format(rospy.get_time(), tof.distance*10)) # Conversion : cm to mm 
+        Publish the data on the topic
+        '''
+        self.publisher.publish(f"{rospy.get_time()},{tof.distance*10}")     # Conversion : cm -> mm 
 
 
 if __name__ == '__main__':

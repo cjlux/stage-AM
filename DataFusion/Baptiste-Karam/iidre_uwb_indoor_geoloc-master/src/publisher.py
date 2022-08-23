@@ -4,24 +4,32 @@ import time, serial, rospy
 from std_msgs.msg import String
 
 class UwbXyzPublisher(object):
-    '''This class allows to publish the data from the IIDRE system on a specific topic.
+    '''
+    This class allows to publish the data from the IIDRE system on a specific topic.
     '''
     def __init__(self):
         '''
         Parameters: None
         
-        Parameters take from ROS_param:
-          name: str, the name of the device, default: "uwb"
-          port: str, the name of the serial line, default: "/dev/ttyACM0"
+        Parameters taken from ROS_param:
+          name:str: the name of the device, default: "uwb"
+          port:str: the name of the serial line, default: "/dev/ttyACM0"
            
         Initialization of the topic by the Publisher:
         The name of the topic and the type of messages allowed.
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
-        self.serial      = None
-        self.topic_name  = rospy.Publisher('iidre_position', String, queue_size=10)
+        self.serial      = None   # will be set by the 'connect' mthod.
+        self.publisher   = rospy.Publisher('iidre_position', String, queue_size=10)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
+        
+        '''
+        JLC: from https://wiki.ros.org/rospy/Overview/Publishers%20and%20SubscribersSetting:
+        the queue_size to 1 is a valid approach if you want to make sure that a new published value 
+        will always prevent any older not yet sent values to be dropped. This is good for, say, 
+        a sensor that only cares about the latest measurement. e.g. never send older measurements 
+        if a newer one exists. '''
 
     def connect(self):
         '''
@@ -33,7 +41,7 @@ class UwbXyzPublisher(object):
             except:
                 pass
 
-        rospy.loginfo("Connecting to {}...".format(self.device_port))
+        rospy.loginfo(f"Connecting to {self.device_port}...")
         self.serial = serial.Serial(self.device_port)
         rospy.loginfo(f"Connected! Now publishing data from '{self.device_name}'...")
 
@@ -43,7 +51,7 @@ class UwbXyzPublisher(object):
         Enter in an infinite loop to read a data line from the serial link,
         pre-process the string and calls the publish method.
         '''
-        rate = rospy.Rate(100) #100 Hz => 10 ms
+        rate = rospy.Rate(100)      #100 Hz => 10 ms
         while not rospy.is_shutdown():
             try:
                 line = self.serial.readline().decode("ascii")
@@ -67,7 +75,7 @@ class UwbXyzPublisher(object):
         # Delete the informations about the velocity
         line=line[:len(line)-4]
 
-        self.topic_name.publish(line)
+        self.publisher.publish(line)
 
 if __name__ == "__main__":
     node = UwbXyzPublisher()
