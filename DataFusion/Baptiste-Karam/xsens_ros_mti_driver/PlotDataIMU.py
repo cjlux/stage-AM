@@ -14,7 +14,7 @@ class Plot_IMU(object):
     TYPE_INFO = {'acceleration': ["Acceleration", "X", "Y", "Z", "m/$s^2$", 25],
                  'angular_velocity': ["Angular Veolicty", "$\theta$", "$\phi$", "$\psi$", "rad/s", 4],
                  'magnetic': ["Magnetic", "X", "Y", "Z", "rad/$\mu$T", 5],
-                 'euler': ["Euler angle", "X", "Y", "Z", "rad", 4]}
+                 'euler': ["Euler angle", "Roll", "Pitch", "Yaw", "degrés", 90]}
 
     def __init__(self, type_info, data_file, stat):
         '''Parameters:
@@ -73,6 +73,9 @@ class Plot_IMU(object):
            the options chosen (--type_info and --stat).
         '''
 
+        if type_info == "euler" :
+            data[:,1:] = np.degrees(data[:,1:])
+
         X, Y, Z = data[:,1], data[:,2], data[:,3]
         T = data[:,0]
 
@@ -85,13 +88,13 @@ class Plot_IMU(object):
         plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
         fig.set_size_inches((11,9))
         fig.suptitle(f"Plot data from file <{self.data_file}>", fontsize=16)
-        marker_size = 5 if len(Z) <= 30 else 1
+        marker_size = 1.5 if len(Z) <= 30 else 1
         ymax = Plot_IMU.TYPE_INFO[self.type_info][5]
 
         axe = axes[0]
         axe.set_ylim(-ymax, ymax)
-        axe.plot(T, X, '.:b', markersize=marker_size, linewidth=0.3, color='r', label=f"{Plot_IMU.TYPE_INFO[self.type_info][1]} {self.type_info}")
-        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][1]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
+        axe.plot(T, X, '.-r', markersize=marker_size, linewidth=0.3, color='r', label=f"{Plot_IMU.TYPE_INFO[self.type_info][1]} {self.type_info}")
+        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][1]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
@@ -102,7 +105,7 @@ class Plot_IMU(object):
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
-            box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
+            box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
             axe.text(0, ymax*.98,
                      fr"mean$_x$: {x_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_x$: {x_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(x$_{{min}}$, $x_{{max}}$): ({x_min*.1:.1f}, {x_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
@@ -112,8 +115,8 @@ class Plot_IMU(object):
 
         axe = axes[1]
         axe.set_ylim(-ymax, ymax)
-        axe.plot(T, Y, '.:b', markersize=marker_size, linewidth=0.3, color='g', label=f"{Plot_IMU.TYPE_INFO[self.type_info][2]} {self.type_info}")
-        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][2]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
+        axe.plot(T, Y, '.-g', markersize=marker_size, linewidth=0.3, color='g', label=f"{Plot_IMU.TYPE_INFO[self.type_info][2]} {self.type_info}")
+        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][2]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
@@ -124,7 +127,7 @@ class Plot_IMU(object):
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
-            box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
+            box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
             axe.text(0, ymax*.98,
                      fr"mean$_y$: {y_mean*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_y$: {y_std*.1:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(y$_{{min}}$, $y_{{max}}$): ({y_min*.1:.1f}, {y_max*.1:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
@@ -134,8 +137,8 @@ class Plot_IMU(object):
 
         axe = axes[2]
         axe.set_ylim(-ymax, ymax)
-        axe.plot(T, Z, '.:b', markersize=marker_size, linewidth=0.3, color='b', label=f"{Plot_IMU.TYPE_INFO[self.type_info][3]} {self.type_info}")
-        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][3]} {Plot_IMU.TYPE_INFO[self.type_info][0]}")
+        axe.plot(T, Z, '.-b', markersize=marker_size, linewidth=0.3, color='b', label=f"{Plot_IMU.TYPE_INFO[self.type_info][3]} {self.type_info}")
+        axe.set_title(f"{Plot_IMU.TYPE_INFO[self.type_info][3]}")
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:

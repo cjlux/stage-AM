@@ -23,9 +23,16 @@ class miniapterros_listner:
           message_filters.Subscriber takes in parameters : the topic on which it is registered
           as a subscriber and the given type of the messages.
 
-          message_filters.ApproximateTimeSynchronizer() takes in parameters : a list of multiple subscribers,
-          queue size, time interval for time synchronization and a parameter that allow the access to different
-          headers in order to have the TimeStamped for each sensor.
+          message_filters.ApproximateTimeSynchronizer() synchronizes messages by their timestamp,
+          only pass them through when all have arrived
+
+          Parameters :
+              a list of multiple subscribers,
+              queue size : sets of messages should be stored from each input filter
+                           (by timestamp) while waiting for all messages to arrive,
+              slop : delay in secondes with which messages can be synchronized, 
+              allow_headerless : allow the access to different headers in order 
+                                 to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
         self.log_file = log_file
@@ -35,13 +42,15 @@ class miniapterros_listner:
         self.subscriber_mti = message_filters.Subscriber("/filter/quaternion", QuaternionStamped)
         print("instance of MiniApterros created ...")
         
-        # TODO Karam: commenterla ligne ci-dessous:
+
         self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre, 
                                                                 self.subscriber_lidar, 
                                                                 self.subscriber_mti],
                                                                 queue_size = 10, 
                                                                 slop = 1, 
                                                                 allow_headerless=True)
+        
+        
         self.tss.registerCallback(self.callback)
 
 
@@ -103,7 +112,7 @@ class miniapterros_listner:
         matrix_new = np.dot(matrix_euler, matrix_xyz)
 
         self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(-height_quaternion[0,3])+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n"+"\n")
 
 
     def parsing_iidre(self, data_iidre):
@@ -143,7 +152,19 @@ class miniapterros_listner:
 
 if __name__ == '__main__':
 
-   uniq_file_name = f"./Data_fusion_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   import time, sys
+
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--file_prefix", type=str, default="")
+   parser.add_argument("--duration", type=int, default=0)
+   args = parser.parse_args()
+   file_prefix = args.file_prefix
+   duration = args.duration
+
+   uniq_file_name = f"./Data_fusion_"
+   if file_prefix != "":
+      uniq_file_name += f"{file_prefix}_"
+   uniq_file_name += f"{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 
    with open(uniq_file_name, "w") as f:
@@ -158,4 +179,7 @@ if __name__ == '__main__':
         # run simultaneously.
 
         # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()
+        if duration:
+            rospy.sleep(duration)
+        else:
+            rospy.spin()

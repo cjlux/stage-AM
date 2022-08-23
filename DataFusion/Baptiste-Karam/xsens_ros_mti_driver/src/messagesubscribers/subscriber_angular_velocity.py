@@ -51,9 +51,19 @@ class xsens_mti_listener:
 
 if __name__ == '__main__':
 
-   import time
+   import time, sys
 
-   uniq_file_name = f"./Data_MTi_angular_velocity_{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--file_prefix", type=str, default="")
+   parser.add_argument("--duration", type=int, default=0)
+   args = parser.parse_args()
+   file_prefix = args.file_prefix
+   duration = args.duration
+
+   uniq_file_name = f"./Data_MTi_angular_velocity_"
+   if file_prefix != "":
+      uniq_file_name += f"{file_prefix}_"
+   uniq_file_name += f"{time.strftime('%y-%m-%d_%H-%M-%S', time.localtime())}.txt"
    print(f"writing data in <{uniq_file_name}>")
 
    with open(uniq_file_name, "w") as f:
@@ -68,4 +78,7 @@ if __name__ == '__main__':
         rospy.init_node('xsens_mti_listener', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
-        rospy.spin()
+        if duration:
+            rospy.sleep(duration)
+        else:
+            rospy.spin()
