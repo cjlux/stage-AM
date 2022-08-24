@@ -64,7 +64,7 @@ if __name__ == '__main__':
                 values = fb[1].split(",")
                 real_height = values[-1]
                 data_traite_euler.append(float(real_height))
-            elif fb_cmd == "Time":
+            elif fb_cmd == "Time-MTi-30":
                 time.append(float(fb[1].replace(" ", "")))
 
             if alt.startswith("#"):
