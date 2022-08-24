@@ -21,13 +21,21 @@ parser.add_argument('--DIST', action="store_true",
                      help="wether to plot +DIST data or not")
 parser.add_argument('--DIST_DBG', action="store_true",
                      help="wether to plot +DIST_DBG data or not")
+parser.add_argument('--time', action="store_true",
+                     help="wether to plot the histogram of the sampling time intervall")
 
 args = parser.parse_args()
 TRAJ = args.TRAJ
 DIST = args.DIST
 DIST_DBG = args.DIST_DBG
 stat = args.stat
+time = args.time
 data_file = args.data_file
+
+if time:
+    for option, name in zip((TRAJ, DIST, DIST_DBG), ('TRAJ', 'DIST', 'DIST_DBG')):
+        print(f"Cannot use --{name} whith --time: deactivating --{name}")
+        option = False
 
 
 if data_file is None:
@@ -96,7 +104,7 @@ for (key, val) in distance.items():
 for (key, val) in distance_dbg.items():
    distance_dbg[key]=np.array(val)
 
-nb_graph = 1 + DIST + DIST_DBG + TRAJ
+nb_graph = 1 + DIST + DIST_DBG + TRAJ + time
 
 sizes   = ((),
            (10,4),
@@ -120,6 +128,7 @@ MS = 1.5  # MarkerSize
 LW = 0.3  # LineWidth
 
 if nb_graph == 1: axes = [axes]
+
 
 ########################################
 # Always plot the positions X & Y:
@@ -152,6 +161,37 @@ axe.grid(True)
 leg = axe.legend(loc='lower right', fontsize=10, framealpha=0.7)
 leg.texts[0].set_color(p1[0].get_color())
 leg.texts[1].set_color(p2[0].get_color())
+
+if time:
+    image_file += '--time'
+    num_axe += 1
+    axe = axes[num_axe]
+
+    T = (data[1:,0] - data[:-1,0]).astype(int)
+    axe.set_title("histogram of acquisition time intervals")
+
+    S = list(set(T))
+    S.sort()
+    T = T.tolist()
+    H = []
+    for s in S:
+        c = T.count(s)
+        H.append(c)
+        print(f"{s:4d} ms apparaît {c:3d} fois")
+    X = list(range(len(H)))
+    #axe.grid(zorder=0)
+    axe.bar(X, H)
+    axe.set_xlim(-1, max(10, max(X))+1)
+    axe.set_xticks(X)
+    axe.set_xlabel('acquisition time interval [ms]')
+    axe.set_xticklabels(S)
+    ymin, ymax = axe.get_ylim()
+    for x, y in zip(X, H):
+        axe.text(x, y+0.01*ymax, y, ha='center', color='b', size=8)
+
+    print("S", S)
+    print("H", H)
+    
 
 if DIST:
     image_file += '--DIST'
