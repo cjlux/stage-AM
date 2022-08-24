@@ -20,7 +20,7 @@ class UwbXyzPublisher(object):
         '''
         rospy.init_node("iidre_uwb_xyz_publisher")
         self.serial      = None   # will be set by the 'connect' mthod.
-        self.publisher   = rospy.Publisher('iidre_position', String, queue_size=10)
+        self.publisher   = rospy.Publisher('iidre_position', String, queue_size=1)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
         
@@ -42,7 +42,7 @@ class UwbXyzPublisher(object):
                 pass
 
         rospy.loginfo(f"Connecting to {self.device_port}...")
-        self.serial = serial.Serial(self.device_port)
+        self.serial = serial.Serial(self.device_port, baudrate = 115200)
         rospy.loginfo(f"Connected! Now publishing data from '{self.device_name}'...")
 
     def run(self):
@@ -54,10 +54,19 @@ class UwbXyzPublisher(object):
         rate = rospy.Rate(100)      #100 Hz => 10 ms
         while not rospy.is_shutdown():
             try:
-                line = self.serial.readline().decode("ascii")
-                line = line.strip()          # remove \n or \t or \r at begin or end of the str
-                line = line.replace(' ','0') # we use 2D configutaion: z value is a space
-                #print(f"line:<{line}>")
+                buffer = bytes()
+                if self.serial.in_waiting > 0:
+                        buffer += self.serial.read(self.serial.in_waiting)
+                        try:
+                            complete = buffer[:buffer.index(b'}')+1]  # get up to '}'
+                            buffer = buffer[buffer.index(b'}')+1:]  # leave the rest in buffer
+                        except ValueError:
+                            continue  # Go back and keep reading
+                        line = buffer.decode('ascii')
+                else :
+                        line = self.serial.readline().decode("ascii")
+                        line = line.strip()          # remove \n or \t or \r at gebin or end of the str
+                        line = line.replace(' ','0') # we use 2D configutaion: z value is a space
                 self.publish(line)
                 rate.sleep()
             except (ValueError, IndexError):
@@ -75,6 +84,7 @@ class UwbXyzPublisher(object):
         # Delete the informations about the velocity
         line=line[:len(line)-4]
 
+        #Partie modifiée par nous
         self.publisher.publish(line)
 
 if __name__ == "__main__":
