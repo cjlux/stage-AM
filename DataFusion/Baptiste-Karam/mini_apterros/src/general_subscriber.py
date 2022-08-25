@@ -80,9 +80,9 @@ class miniapterros_listner:
         data_mti_euler = []
         data_mti_euler = Rotation.from_quat(data_mti.quaternion)
         data_mti_euler = data_mti_euler.as_euler('xyz')
-        roll = data_mti_euler[0]
-        pitch = data_mti_euler[1]
-        yaw = data_mti_euler[2]
+        roll = abs(data_mti_euler[0])
+        pitch = abs(data_mti_euler[1])
+        yaw = abs(data_mti_euler[2])
 
         self.log_file.write("Time: "+str(data_mti.header)+"\n")
         self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+str(data_iidre.data[1])+"\n")
@@ -103,7 +103,7 @@ class miniapterros_listner:
         matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data]])
 
         matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
-        matrix_pitch = [[cos(pitch), 0, sin(pitch)],[0, 1, 0],[-sin(pitch), 0, cos(pitch)]]
+        matrix_pitch = [[cos(pitch), 0, -sin(pitch)],[0, 1, 0],[sin(pitch), 0, cos(pitch)]]
         matrix_yaw = [[cos(yaw), -sin(yaw), 0],[sin(yaw), cos(yaw), 0],[0, 0, 1]]
 
         matrix_euler = np.dot(matrix_roll, matrix_pitch)
