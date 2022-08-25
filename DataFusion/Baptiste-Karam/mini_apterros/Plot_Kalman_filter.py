@@ -3,8 +3,30 @@
 import numpy as np
 
 class KalmanFilter(object):
+    '''
+    This class provides the first Kalman filter estimates and those recalibrated
+    using measurements from the IIDRE, LiDAR and MTi-30 sensors.
+    '''
     def __init__(self, F = None, B = None, H = None, Q = None, R = None, P = None, x0 = None):
+        '''
+        Nota Bene :
+          z0 : observation or measurement of the process
 
+        Parameters :
+          n : number of columns of F
+          m : number of columns of H
+          F : matrix that connects the previous state k-1 to the current state k
+          B : matrix that relates the control input u(k) to the state x(k), set
+          to 0 by default
+          H : matrix that relates the state x(k) to the measure z(k)
+          Q : covariance matrix of the process noise, defined by an identity
+          matrix of size n by default
+          R : covariance matrix of the measurement noise, defined by an identity
+          matrix of size n by default
+          P : estimation matrix of the covariance of the error, defined by an
+          identity matrix of size n by default
+          x0 : estimation of the state
+        '''
         if(F is None or H is None):
             raise ValueError("Set proper system dynamics.")
 
@@ -20,11 +42,28 @@ class KalmanFilter(object):
         self.x = np.zeros((self.n, 1)) if x0 is None else x0
 
     def predict(self, u = 0):
+        '''
+        It starts by determining the value of x, which defines the new predicted.
+
+        Then, the a priori estimation matrix of the covariance of the error P is
+        calculated.
+        '''
         self.x = np.dot(self.F, self.x) + np.dot(self.B, u)
         self.P = np.dot(np.dot(self.F, self.P), self.F.T) + self.Q
         return self.x
 
     def update(self, z):
+        '''
+        The innovation is defined here as a comparison between the predicted
+        value and the measured value. The covariance associated with this column
+        matrix is also calculated.
+
+        This allows us to determine the optimal Kalman gain and thus the updated
+        state.
+
+        Finally an identity matrix of size n is initialized to update the
+        covariance matrix P.
+        '''
         y = z - np.dot(self.H, self.x)
         S = self.R + np.dot(self.H, np.dot(self.P, self.H.T))
         K = np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
@@ -33,19 +72,28 @@ class KalmanFilter(object):
         self.P = np.dot(np.dot(I - np.dot(K, self.H), self.P),
         	(I - np.dot(K, self.H)).T) + np.dot(np.dot(K, self.R), K.T)
 
-def kalman_height():
+def kalman_function():
+    '''
+    Reading of the log_file (the .txt file where the data are stored) and the
+    data related to the position of the module over time in order to process
+    them using a Kalman filter.
+    '''
     delta_t = 1.0/60
+    # For the values of the matrix F, these are the values recommended by this
+    # pdf https://cnriut2019.sciencesconf.org/data/6_15H00_FA010.pdf
     F_x = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
-    H_x = np.array([1, 0, 0]).reshape(1, 3)
-    Q_x = np.array([[0.05, 0.05, 0.0], [0.05, 0.05, 0.0], [0.0, 0.0, 0.0]])
-    R_x = np.array([0.5]).reshape(1, 1)
     F_y = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
-    H_y = np.array([1, 0, 0]).reshape(1, 3)
-    Q_y = np.array([[0.05, 0.05, 0.0], [0.05, 0.05, 0.0], [0.0, 0.0, 0.0]])
-    R_y = np.array([0.5]).reshape(1, 1)
     F_z = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
+    H_x = np.array([1, 0, 0]).reshape(1, 3)
+    H_y = np.array([1, 0, 0]).reshape(1, 3)
     H_z = np.array([1, 0, 0]).reshape(1, 3)
-    Q_z = np.array([[0.05, 0.05, 0.0], [0.05, 0.05, 0.0], [0.0, 0.0, 0.0]])
+    # For the values of the Q matrix, these are the values recommended by the
+    # person in this forum https://robotics.stackexchange.com/questions/11178/kalman-filter-gps-imu
+    Q_x = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
+    Q_y = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
+    Q_z = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
+    R_x = np.array([0.5]).reshape(1, 1)
+    R_y = np.array([0.5]).reshape(1, 1)
     R_z = np.array([0.5]).reshape(1, 1)
 
     measurements = []
@@ -81,6 +129,8 @@ def kalman_height():
         time -= time[0]
         x_label = "time [second]"
 
+    # Initialization of the parameters necessary to use the Kalman filter, in
+    # the three dimensions of the space
     kf_x = KalmanFilter(F = F_x, H = H_x, Q = Q_x, R = R_x)
     kf_y = KalmanFilter(F = F_y, H = H_y, Q = Q_y, R = R_y)
     kf_z = KalmanFilter(F = F_z, H = H_z, Q = Q_z, R = R_z)
@@ -88,6 +138,9 @@ def kalman_height():
     predictions_y = []
     predictions_z = []
 
+    # Flow of the elements measured by the different sensors in order to update
+    # the predicted data after their calculation, in the three dimensions of the
+    # space.
     for x in X:
         predictions_x.append(np.dot(H_x,  kf_x.predict())[0])
         kf_x.update(x)
@@ -98,6 +151,8 @@ def kalman_height():
         predictions_z.append(np.dot(H_z,  kf_z.predict())[0])
         kf_z.update(z)
 
+    # Cast of the elements of the list in array, in the three dimensions of the
+    # space.
     predictions_x = np.array(predictions_x)
     predictions_y = np.array(predictions_y)
     predictions_z = np.array(predictions_z)
@@ -255,4 +310,4 @@ if __name__ == '__main__':
 
     print(f"Opening log file <{data_file}>...")
 
-    kalman_height()
+    kalman_function()
