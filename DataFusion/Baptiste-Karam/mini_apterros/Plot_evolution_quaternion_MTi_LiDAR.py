@@ -55,7 +55,7 @@ if __name__ == '__main__':
             if fb_cmd == "DATA_MTi-30 - euler":
                 x, y, z = map(float, fb[1].split(',')[:])
                 data.append([x,y,z])
-            elif fb_cmd == "Time":
+            elif fb_cmd == "Time-MTi-30":
                 time.append(float(fb[1].replace(" ", "")))
 
             if alt.startswith("#"):
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     axe.plot(time, X, '.:b', markersize=marker_size, linewidth=0.3, label="X euler angle")
     axe.set_ylabel("Radian")
     axe.set_xlabel(x_label)
-    ymax = -4
+    ymax = 4
     axe.set_ylim(-ymax, ymax)
     if stat:
         x_mean, x_std = X.mean(), X.std()

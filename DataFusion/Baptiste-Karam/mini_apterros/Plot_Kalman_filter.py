@@ -106,7 +106,7 @@ def kalman_function():
             fb = alt.split(":")
             fb_cmd = fb[0]
 
-            if fb_cmd == "Nouvelles coordonnées - quaternion":
+            if fb_cmd == "Nouvelles coordonnées - euler":
                 x, y, z = map(float, fb[1].split(',')[:])
                 measurements.append([x,y,z])
             elif fb_cmd == "Time-MTi-30":
