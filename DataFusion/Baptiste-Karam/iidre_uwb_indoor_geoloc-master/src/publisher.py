@@ -58,15 +58,18 @@ class UwbXyzPublisher(object):
                 if self.serial.in_waiting > 0:
                         buffer += self.serial.read(self.serial.in_waiting)
                         try:
-                            complete = buffer[:buffer.index(b'}')+1]  # get up to '}'
-                            buffer = buffer[buffer.index(b'}')+1:]  # leave the rest in buffer
+                            buffer = b'+' + buffer.split(b'+')[-1]  # keep only the last frame +MPOS
                         except ValueError:
                             continue  # Go back and keep reading
-                        line = buffer.decode('ascii')
+                        line = str(buffer)
                 else :
                         line = self.serial.readline().decode("ascii")
-                        line = line.strip()          # remove \n or \t or \r at gebin or end of the str
-                        line = line.replace(' ','0') # we use 2D configutaion: z value is a space
+                
+                print(line)
+                        
+                line = line.strip()          # remove \n or \t or \r at begin or end of the str
+                line = line.replace(' ','0') # we use 2D configutaion: z value is a space
+                
                 self.publish(line)
                 rate.sleep()
             except (ValueError, IndexError):
