@@ -103,11 +103,11 @@ class miniapterros_listner:
         matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data]])
 
         matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
-        matrix_pitch = [[cos(pitch), 0, -sin(pitch)],[0, 1, 0],[sin(pitch), 0, cos(pitch)]]
+        matrix_pitch = [[cos(pitch), 0, sin(pitch)],[0, 1, 0],[-sin(pitch), 0, cos(pitch)]]
         matrix_yaw = [[cos(yaw), -sin(yaw), 0],[sin(yaw), cos(yaw), 0],[0, 0, 1]]
 
-        matrix_euler = np.dot(matrix_roll, matrix_pitch)
-        matrix_euler = np.dot(matrix_euler, matrix_yaw)
+        matrix_euler = np.dot(matrix_yaw, matrix_pitch)
+        matrix_euler = np.dot(matrix_euler, matrix_roll)
 
         matrix_new = np.dot(matrix_euler, matrix_xyz)
 
