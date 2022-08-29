@@ -50,7 +50,7 @@ class iidre_listner:
         if fb_cmd == "+MPOS":
             # This is usable if device has been preconfigured with the uwbSupervisor
             # Convert from centimeters (in the JSON infra file) to meters
-            data.data = f"{time},{fb_data[1]},{fb_data[2]}"
+            data.data = f"{fb_cmd}:{time},{fb_data[1]},{fb_data[2]}"
 
 
 if __name__ == '__main__':
