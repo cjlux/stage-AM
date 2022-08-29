@@ -7,7 +7,7 @@ from std_msgs.msg import String
 class iidre_listner:
     '''
     This class allows to get the information published by the publisher of IIDRE
-     and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
+    and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
     registered in the directory where the code is executed.
     '''
     def __init__(self, opened_log_file, verbose=False):
@@ -31,10 +31,9 @@ class iidre_listner:
         If verbose, writes a message in rospy.loginfo about the data it hears.
         Finaly writes the data in the file.
         '''
-        # self.parsing(data)
-        if self.verbose: 
-           rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-        self.log_file.write(str(data.data)+"\n")
+        self.parsing(data)
+        if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+        self.log_file.write(data.data+"\n")
 
     def parsing(self, data):
         '''
@@ -50,7 +49,8 @@ class iidre_listner:
 
         if fb_cmd == "+MPOS":
             # This is usable if device has been preconfigured with the uwbSupervisor
-            data.data = [fb_data[1], fb_data[2]]
+            # Convert from centimeters (in the JSON infra file) to meters
+            data.data = f"{time},{fb_data[1]},{fb_data[2]}"
 
 
 if __name__ == '__main__':

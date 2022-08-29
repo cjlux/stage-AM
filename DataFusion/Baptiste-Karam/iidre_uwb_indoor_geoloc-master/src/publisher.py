@@ -61,7 +61,7 @@ class UwbXyzPublisher(object):
                             buffer = b'+' + buffer.split(b'+')[-1]  # keep only the last frame +MPOS
                         except ValueError:
                             continue  # Go back and keep reading
-                        line = str(buffer)
+                        line = buffer.decode("ascii")
                 else :
                         line = self.serial.readline().decode("ascii")
                 
@@ -84,8 +84,6 @@ class UwbXyzPublisher(object):
         '''
         Publish the data on the topic
         '''
-        # Delete the informations about the velocity
-        line=line[:len(line)-4]
 
         #Partie modifiée par nous
         self.publisher.publish(line)
