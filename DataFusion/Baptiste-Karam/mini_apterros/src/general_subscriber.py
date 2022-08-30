@@ -75,7 +75,10 @@ class miniapterros_listner:
         self.parsing_lidar(data_lidar)
 
         if self.verbose:
-            rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", str(data_iidre.data), str(data_lidar.data), str(data_mti.quaternion))
+            rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", 
+                                                  str(data_iidre.data), 
+                                                  str(data_lidar.data), 
+                                                  str(data_mti.quaternion))
 
         # Transformation quaternion to Euler
         data_mti_euler = []
@@ -83,40 +86,46 @@ class miniapterros_listner:
         data_mti_euler = data_mti_euler.as_euler('xyz')
         roll = abs(data_mti_euler[0])
         pitch = abs(data_mti_euler[1])
-        yaw = abs(data_mti_euler[2])
 
-        self.log_file.write("Time: "+str(data_mti.header)+"\n")
-        self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+str(data_iidre.data[1])+"\n")
-        self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data)+"\n")
-        self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+str(data_mti.quaternion[1])+","+str(data_mti.quaternion[2])+","+str(data_mti.quaternion[3])+"\n")
-        self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+str(data_mti_euler[1])+","+str(data_mti_euler[2])+"\n")
+        self.log_file.write("Time-MTi-30: "+str(data_mti.header)+"\n")
+        self.log_file.write("Time-LiDAR: "+str(data_lidar.data[0])+"\n")
+        self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+
+                                           str(data_iidre.data[1])+"\n")
+        self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
+        self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+
+                                                        str(data_mti.quaternion[1])+","+
+                                                        str(data_mti.quaternion[2])+","+
+                                                        str(data_mti.quaternion[3])+"\n")
+        self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+
+                                                   str(data_mti_euler[1])+","+
+                                                   str(data_mti_euler[2])+"\n")
 
         #Fusion des données du LiDAR et de la MTi-30
 
         #Quaternion
-        vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1])) # On s'interesse à la composante z
+        vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1]))
         quaternion = np.quaternion(float(data_mti.quaternion[3]), 
                                    float(data_mti.quaternion[0]), 
                                    float(data_mti.quaternion[1]), 
                                    float(data_mti.quaternion[2]))
-        vector_v = quaternion.conjugate()*vector_u*quaternion           # Relation de changement de base 
-        height_quaternion = vector_v.z                                  # relever la dernière composante du quaternion
+        vector_v = quaternion.conjugate()*vector_u*quaternion
+        height_quaternion = vector_v.z    # relever la dernière composante du quaternion
 
         #Euler
-        matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data]])
+        matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data[1]]])
 
         matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
         matrix_pitch = [[cos(pitch), 0, sin(pitch)],[0, 1, 0],[-sin(pitch), 0, cos(pitch)]]
-        matrix_yaw = [[cos(yaw), -sin(yaw), 0],[sin(yaw), cos(yaw), 0],[0, 0, 1]]
 
-        matrix_euler = np.dot(matrix_yaw, matrix_pitch)
-        matrix_euler = np.dot(matrix_euler, matrix_roll)
-
+        matrix_euler = np.dot(matrix_pitch, matrix_roll)
         matrix_new = np.dot(matrix_euler, matrix_xyz)
 
-        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(-height_quaternion[0,3])+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+str(data_iidre.data[1])+","+str(matrix_new[2,0])+"\n"+"\n")
-
+        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+
+                                                                  str(data_iidre.data[1])+","+
+                                                                  str(abs(height_quaternion))+"\n")
+        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+
+                                                             str(data_iidre.data[1])+","+
+                                                             str(matrix_new[2,0])+"\n"+"\n")
 
     def parsing_iidre(self, data_iidre):
         ''' 
@@ -155,7 +164,7 @@ class miniapterros_listner:
 
 if __name__ == '__main__':
 
-   import time, sys
+   import time, sys, argparse
 
    parser = argparse.ArgumentParser()
    parser.add_argument("--file_prefix", type=str, default="")
