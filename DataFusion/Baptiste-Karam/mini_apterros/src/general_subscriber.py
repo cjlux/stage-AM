@@ -7,6 +7,7 @@ import message_filters
 from scipy.spatial.transform import Rotation
 from math import cos, sin
 import numpy as np
+import quaternion
 
 class miniapterros_listner:
     ''' 
@@ -93,11 +94,13 @@ class miniapterros_listner:
         #Fusion des données du LiDAR et de la MTi-30
 
         #Quaternion
-        matrix_u = np.matrix([[0], [float(data_iidre.data[0])], [float(data_iidre.data[1])], [float(data_lidar.data)]])
-        data_mti.quaternion = np.array(data_mti.quaternion,dtype=float)
-        quaternion_conj = np.matrix([data_mti.quaternion[0],-data_mti.quaternion[1],-data_mti.quaternion[2],-data_mti.quaternion[3]])
-        height_quaternion = np.dot(quaternion_conj,matrix_u)
-        height_quaternion = np.dot(height_quaternion,np.matrix(data_mti.quaternion))
+        vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1])) # On s'interesse à la composante z
+        quaternion = np.quaternion(float(data_mti.quaternion[3]), 
+                                   float(data_mti.quaternion[0]), 
+                                   float(data_mti.quaternion[1]), 
+                                   float(data_mti.quaternion[2]))
+        vector_v = quaternion.conjugate()*vector_u*quaternion           # Relation de changement de base 
+        height_quaternion = vector_v.z                                  # relever la dernière composante du quaternion
 
         #Euler
         matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data]])

@@ -69,6 +69,7 @@ if __name__ == '__main__':
 
             if alt.startswith("#"):
                 continue   # skip comment lines
+            
 
     data_brut = np.array(data_brut)
     data_traite_quaternion = np.array(data_traite_quaternion)

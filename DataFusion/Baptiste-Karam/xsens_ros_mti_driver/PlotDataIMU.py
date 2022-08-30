@@ -14,7 +14,7 @@ class Plot_IMU(object):
     TYPE_INFO = {'acceleration': ["Acceleration", "X", "Y", "Z", "m/$s^2$", 25],
                  'angular_velocity': ["Angular Veolicty", "$\theta$", "$\phi$", "$\psi$", "rad/s", 4],
                  'magnetic': ["Magnetic", "X", "Y", "Z", "rad/$\mu$T", 5],
-                 'euler': ["Euler angle", "Roll", "Pitch", "Yaw", "degrés", 90]}
+                 'euler': ["Euler angle", "Roll", "Pitch", "Yaw", "degrees", 90]}
 
     def __init__(self, type_info, data_file, stat):
         '''Parameters:
