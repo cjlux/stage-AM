@@ -57,7 +57,7 @@ class xsens_mti_listener:
         data.header = float(tmp_data[5]) + int(tmp_data[7]) * 1e-9
 
         data.quaternion = str(data.quaternion).replace("\n", ":")       # Replace the \n by : in the str
-        fb_data = data.quaternion.split(":")                            # Récupère les accelerations selon x, y et z
+        fb_data = data.quaternion.split(":")                            # Retrieve the quaternions in x, y and z
         data.quaternion = [fb_data[1],fb_data[3],fb_data[5],fb_data[7]]
 
 if __name__ == '__main__':

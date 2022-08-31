@@ -47,7 +47,7 @@ class xsens_mti_listener:
         data.header = float(tmp_data[5]) + int(tmp_data[7]) * 1e-9
 
         data.vector = str(data.vector).replace("\n", ":")       # Replace the \n by : in the str
-        fb_data = data.vector.split(":")                        # Récupère les accelerations selon x, y et z
+        fb_data = data.vector.split(":")                        # Retrieve the magnetic forces in x, y and z
 
         data.vector = [fb_data[1],fb_data[3],fb_data[5]]
 

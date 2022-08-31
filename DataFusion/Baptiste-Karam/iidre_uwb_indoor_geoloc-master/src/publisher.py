@@ -85,7 +85,7 @@ class UwbXyzPublisher(object):
         Publish the data on the topic
         '''
 
-        #Partie modifiée par nous
+        # Part that has been modified
         self.publisher.publish(line)
 
 if __name__ == "__main__":
