@@ -1,20 +1,22 @@
 
 # source : https://github.com/zziz/kalman-filter
 import numpy as np
+import random
 
 class KalmanFilter(object):
     '''
     This class provides the first Kalman filter estimates and those recalibrated
     using measurements from the IIDRE, LiDAR and MTi-30 sensors.
     '''
-    def __init__(self, F = None, B = None, H = None, Q = None, R = None, P = None, x0 = None):
+    def __init__(self, F = None, B = None, H = None, Q = None, R = None,
+                 P = None, x0 = None, w = None):
         '''
         Nota Bene :
           z0 : observation or measurement of the process
 
         Parameters :
           n : number of columns of F
-          m : number of columns of H
+          m : number of lines of H
           F : matrix that connects the previous state k-1 to the current state k
           B : matrix that relates the control input u(k) to the state x(k), set
           to 0 by default
@@ -22,33 +24,38 @@ class KalmanFilter(object):
           Q : covariance matrix of the process noise, defined by an identity
           matrix of size n by default
           R : covariance matrix of the measurement noise, defined by an identity
-          matrix of size n by default
+          matrix of size m by default
           P : estimation matrix of the covariance of the error, defined by an
           identity matrix of size n by default
           x0 : estimation of the state
+          w : process noise
         '''
         if(F is None or H is None):
             raise ValueError("Set proper system dynamics.")
 
         self.n = F.shape[1]
-        self.m = H.shape[1]
+        self.m = H.shape[0]
 
         self.F = F
         self.H = H
         self.B = 0 if B is None else B
         self.Q = np.eye(self.n) if Q is None else Q
-        self.R = np.eye(self.n) if R is None else R
+        self.R = np.eye(self.m) if R is None else R
         self.P = np.eye(self.n) if P is None else P
         self.x = np.zeros((self.n, 1)) if x0 is None else x0
+        self.w = np.zeros((self.m, 1)) if w is None else w
 
     def predict(self, u = 0):
         '''
         It starts by determining the value of x, which defines the new predicted.
 
+        Note that, in our case, u = 0 since we only consider the position returned
+        by the sensors and not the forces applied to the tag.
+
         Then, the a priori estimation matrix of the covariance of the error P is
         calculated.
         '''
-        self.x = np.dot(self.F, self.x) + np.dot(self.B, u)
+        self.x = np.dot(self.F, self.x) + np.dot(self.B, u) + self.w
         self.P = np.dot(np.dot(self.F, self.P), self.F.T) + self.Q
         return self.x
 
@@ -69,8 +76,7 @@ class KalmanFilter(object):
         K = np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
         self.x = self.x + np.dot(K, y)
         I = np.eye(self.n)
-        self.P = np.dot(np.dot(I - np.dot(K, self.H), self.P),
-        	(I - np.dot(K, self.H)).T) + np.dot(np.dot(K, self.R), K.T)
+        self.P = np.dot(I - np.dot(K, self.H), self.P)
 
 def kalman_function():
     '''
@@ -78,6 +84,8 @@ def kalman_function():
     data related to the position of the module over time in order to process
     them using a Kalman filter.
     '''
+    # delta_t must be equal to 1s for the discretization of the navigation equations
+    # according to the document : https://cnriut2019.sciencesconf.org/data/6_15H00_FA010.pdf
     delta_t = 1.0/60
     # For the values of the matrix F, these are the values recommended by this
     # pdf https://cnriut2019.sciencesconf.org/data/6_15H00_FA010.pdf
@@ -87,14 +95,21 @@ def kalman_function():
     H_x = np.array([1, 0, 0]).reshape(1, 3)
     H_y = np.array([1, 0, 0]).reshape(1, 3)
     H_z = np.array([1, 0, 0]).reshape(1, 3)
+
     # For the values of the Q matrix, these are the values recommended by the
     # person in this forum https://robotics.stackexchange.com/questions/11178/kalman-filter-gps-imu
-    Q_x = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
-    Q_y = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
-    Q_z = np.array([[0.1, 0.0, 0.0], [0.0, 0.1, 0.0], [0.0, 0.0, 0.1]])
-    R_x = np.array([0.5]).reshape(1, 1)
-    R_y = np.array([0.5]).reshape(1, 1)
-    R_z = np.array([0.5]).reshape(1, 1)
+    alpha = 0.1
+    Q_x = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
+    Q_y = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
+    Q_z = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
+
+    # This parameters represent the initial position of the tag
+    delta_x = 140
+    delta_y = 170
+    delta_z = 20
+    P_x = np.array([[delta_x, 0.0, 0.0], [0.0, delta_x, 0.0], [0.0, 0.0, delta_x]])
+    P_y = np.array([[delta_y, 0.0, 0.0], [0.0, delta_y, 0.0], [0.0, 0.0, delta_y]])
+    P_z = np.array([[delta_z, 0.0, 0.0], [0.0, delta_z, 0.0], [0.0, 0.0, delta_z]])
 
     measurements = []
     time = []
@@ -130,10 +145,15 @@ def kalman_function():
         x_label = "time [second]"
 
     # Initialization of the parameters necessary to use the Kalman filter, in
-    # the three dimensions of the space
-    kf_x = KalmanFilter(F = F_x, H = H_x, Q = Q_x, R = R_x)
-    kf_y = KalmanFilter(F = F_y, H = H_y, Q = Q_y, R = R_y)
-    kf_z = KalmanFilter(F = F_z, H = H_z, Q = Q_z, R = R_z)
+    # the three dimensions of the space. Note that the noise of the process w is
+    # defined from a Gaussian centered in 0 and of standard deviation equal to
+    # what was measured in the case of a stationary tag.
+    kf_x = KalmanFilter(F = F_x, H = H_x, Q = Q_x, P = P_x,
+                        w = np.array([random.gauss(0, 0.73)]).reshape(1, 1))
+    kf_y = KalmanFilter(F = F_y, H = H_y, Q = Q_y, P = P_y,
+                        w = np.array([random.gauss(0, 0.53)]).reshape(1, 1))
+    kf_z = KalmanFilter(F = F_z, H = H_z, Q = Q_z, P = P_z,
+                        w = np.array([random.gauss(0, 0.6)]).reshape(1, 1))
     predictions_x = []
     predictions_y = []
     predictions_z = []
