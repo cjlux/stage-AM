@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import time, sys, argparse
-import rospy
 from std_msgs.msg import String
+import rospy, time, sys, argparse
 
-class iidre_listner:
+class iidre_listener:
     '''
     This class allows to get the information published by the publisher of IIDRE
     and stores those data in a file Data_iidre_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
@@ -31,9 +30,13 @@ class iidre_listner:
         If verbose, writes a message in rospy.loginfo about the data it hears.
         Finaly writes the data in the file.
         '''
-        self.parsing(data)
-        if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
-        self.log_file.write(data.data+"\n")
+
+        if self.log_file.closed == False:
+                self.parsing(data)
+                if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+                self.log_file.write(data.data+"\n")
+        else:
+                return
 
     def parsing(self, data):
         '''
@@ -54,12 +57,10 @@ class iidre_listner:
 
 
 if __name__ == '__main__':
-
-   import time, sys
-
+   
    parser = argparse.ArgumentParser()
    parser.add_argument("--file_prefix", type=str, default="")
-   parser.add_argument("--duration", type=int, default=0)
+   parser.add_argument("--duration", type=float, default=0.0)
    args = parser.parse_args()
    file_prefix = args.file_prefix
    duration = args.duration
@@ -72,7 +73,7 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        listner = iidre_listner(f)
+        listener = iidre_listener(f)
 
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The

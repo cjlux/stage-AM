@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
-import time, rospy
-from std_msgs.msg import String
 from geometry_msgs.msg import QuaternionStamped
-import message_filters
-from scipy.spatial.transform import Rotation
 from math import cos, sin
+from scipy.spatial.transform import Rotation
+from std_msgs.msg import String
 import numpy as np
-import quaternion
+import rospy, message_filters, quaternion, time, sys, argparse
 
-class miniapterros_listner:
+class miniapterros_listener:
     ''' 
     This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
     and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
@@ -70,62 +68,66 @@ class miniapterros_listner:
              New_treated_coordinates (using quaternion)
              New_treated_coordinates (using angles of Euler)
         '''
-        self.parsing_iidre(data_iidre)
-        self.parsing_mti(data_mti)
-        self.parsing_lidar(data_lidar)
+        
+        if self.log_file.closed == False:
+                self.parsing_iidre(data_iidre)
+                self.parsing_mti(data_mti)
+                self.parsing_lidar(data_lidar)
 
-        if self.verbose:
-            rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", 
-                                                  str(data_iidre.data), 
-                                                  str(data_lidar.data), 
-                                                  str(data_mti.quaternion))
+                if self.verbose:
+                    rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", 
+                                                          str(data_iidre.data), 
+                                                          str(data_lidar.data), 
+                                                          str(data_mti.quaternion))
 
-        # Transformation quaternion to Euler
-        data_mti_euler = []
-        data_mti_euler = Rotation.from_quat(data_mti.quaternion)
-        data_mti_euler = data_mti_euler.as_euler('xyz')
-        roll = abs(data_mti_euler[0])
-        pitch = abs(data_mti_euler[1])
+                # Transformation quaternion to Euler
+                data_mti_euler = []
+                data_mti_euler = Rotation.from_quat(data_mti.quaternion)
+                data_mti_euler = data_mti_euler.as_euler('xyz')
+                roll = abs(data_mti_euler[0])
+                pitch = abs(data_mti_euler[1])
 
-        self.log_file.write("Time-MTi-30: "+str(data_mti.header)+"\n")
-        self.log_file.write("Time-LiDAR: "+str(data_lidar.data[0])+"\n")
-        self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+
-                                           str(data_iidre.data[1])+"\n")
-        self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
-        self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+
-                                                        str(data_mti.quaternion[1])+","+
-                                                        str(data_mti.quaternion[2])+","+
-                                                        str(data_mti.quaternion[3])+"\n")
-        self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+
-                                                   str(data_mti_euler[1])+","+
-                                                   str(data_mti_euler[2])+"\n")
+                self.log_file.write("Time-MTi-30: "+str(data_mti.header)+"\n")
+                self.log_file.write("Time-LiDAR: "+str(data_lidar.data[0])+"\n")
+                self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+
+                                                   str(data_iidre.data[1])+"\n")
+                self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
+                self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+
+                                                                str(data_mti.quaternion[1])+","+
+                                                                str(data_mti.quaternion[2])+","+
+                                                                str(data_mti.quaternion[3])+"\n")
+                self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+
+                                                           str(data_mti_euler[1])+","+
+                                                           str(data_mti_euler[2])+"\n")
 
-        #Fusion des données du LiDAR et de la MTi-30
+                #Fusion des données du LiDAR et de la MTi-30
 
-        #Quaternion
-        vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1]))
-        quaternion = np.quaternion(float(data_mti.quaternion[3]), 
-                                   float(data_mti.quaternion[0]), 
-                                   float(data_mti.quaternion[1]), 
-                                   float(data_mti.quaternion[2]))
-        vector_v = quaternion.conjugate()*vector_u*quaternion
-        height_quaternion = vector_v.z    # relever la dernière composante du quaternion
+                #Quaternion
+                vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1]))
+                quaternion = np.quaternion(float(data_mti.quaternion[3]), 
+                                           float(data_mti.quaternion[0]), 
+                                           float(data_mti.quaternion[1]), 
+                                           float(data_mti.quaternion[2]))
+                vector_v = quaternion.conjugate()*vector_u*quaternion
+                height_quaternion = vector_v.z    # relever la dernière composante du quaternion
 
-        #Euler
-        matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data[1]]])
+                #Euler
+                matrix_xyz = np.matrix([[int(data_iidre.data[0])], [int(data_iidre.data[1])], [data_lidar.data[1]]])
 
-        matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
-        matrix_pitch = [[cos(pitch), 0, sin(pitch)],[0, 1, 0],[-sin(pitch), 0, cos(pitch)]]
+                matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
+                matrix_pitch = [[cos(pitch), 0, sin(pitch)],[0, 1, 0],[-sin(pitch), 0, cos(pitch)]]
 
-        matrix_euler = np.dot(matrix_pitch, matrix_roll)
-        matrix_new = np.dot(matrix_euler, matrix_xyz)
+                matrix_euler = np.dot(matrix_pitch, matrix_roll)
+                matrix_new = np.dot(matrix_euler, matrix_xyz)
 
-        self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+
-                                                                  str(data_iidre.data[1])+","+
-                                                                  str(abs(height_quaternion))+"\n")
-        self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+
-                                                             str(data_iidre.data[1])+","+
-                                                             str(matrix_new[2,0])+"\n"+"\n")
+                self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+
+                                                                          str(data_iidre.data[1])+","+
+                                                                          str(abs(height_quaternion))+"\n")
+                self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+
+                                                                     str(data_iidre.data[1])+","+
+                                                                     str(matrix_new[2,0])+"\n"+"\n")
+        else:
+                return
 
     def parsing_iidre(self, data_iidre):
         ''' 
@@ -164,11 +166,9 @@ class miniapterros_listner:
 
 if __name__ == '__main__':
 
-   import time, sys, argparse
-
    parser = argparse.ArgumentParser()
    parser.add_argument("--file_prefix", type=str, default="")
-   parser.add_argument("--duration", type=int, default=0)
+   parser.add_argument("--duration", type=float, default=0.0)
    args = parser.parse_args()
    file_prefix = args.file_prefix
    duration = args.duration
@@ -181,8 +181,8 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        rospy.init_node('miniapterros_listner', anonymous = True)
-        listner = miniapterros_listner(f)
+        rospy.init_node('miniapterros_listener', anonymous = True)
+        listener = miniapterros_listener(f)
 
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import rospy
 
-from std_msgs.msg import String
 from geometry_msgs.msg import Vector3Stamped
+from std_msgs.msg import String
+import rospy, time, sys, argparse
 
 class xsens_mti_listener:
     '''
@@ -30,10 +30,14 @@ class xsens_mti_listener:
 	    Then it displays the 3 components of angular velocity when verbose=True
 	    Parameters:
 	    Data: data received
-	'''
-	self.parsing(data)
-        if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
-        self.log_file.write("Time: "+str(data.header)+", Angular_velocity: "+str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
+	'''	
+	
+        if self.log_file.closed == False:
+		self.parsing(data)
+		if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
+		self.log_file.write("Time: "+str(data.header)+", Angular_velocity: "+str(data.vector[0])+","+str(data.vector[1])+","+str(data.vector[2])+"\n")
+	else:
+		return
 
     def parsing(self, data):
 	''' This function receives data as argument.
@@ -51,11 +55,9 @@ class xsens_mti_listener:
 
 if __name__ == '__main__':
 
-   import time, sys
-
    parser = argparse.ArgumentParser()
    parser.add_argument("--file_prefix", type=str, default="")
-   parser.add_argument("--duration", type=int, default=0)
+   parser.add_argument("--duration", type=float, default=0.0)
    args = parser.parse_args()
    file_prefix = args.file_prefix
    duration = args.duration
@@ -68,7 +70,7 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        listner = xsens_mti_listener(f)
+        listener = xsens_mti_listener(f)
 
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The
