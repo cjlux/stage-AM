@@ -10,11 +10,11 @@ class UwbXyzPublisher(object):
     def __init__(self):
         '''
         Parameters: None
-        
+
         Parameters taken from ROS_param:
           name:str: the name of the device, default: "uwb"
           port:str: the name of the serial line, default: "/dev/ttyACM0"
-           
+
         Initialization of the topic by the Publisher:
         The name of the topic and the type of messages allowed.
         '''
@@ -23,12 +23,12 @@ class UwbXyzPublisher(object):
         self.publisher   = rospy.Publisher('iidre_position', String, queue_size=1)
         self.device_name = rospy.get_param("name", "uwb")
         self.device_port = rospy.get_param("port", "/dev/ttyACM0")
-        
+
         '''
         JLC: from https://wiki.ros.org/rospy/Overview/Publishers%20and%20SubscribersSetting:
-        the queue_size to 1 is a valid approach if you want to make sure that a new published value 
-        will always prevent any older not yet sent values to be dropped. This is good for, say, 
-        a sensor that only cares about the latest measurement. e.g. never send older measurements 
+        the queue_size to 1 is a valid approach if you want to make sure that a new published value
+        will always prevent any older not yet sent values to be dropped. This is good for, say,
+        a sensor that only cares about the latest measurement. e.g. never send older measurements
         if a newer one exists. '''
 
     def connect(self):
@@ -51,7 +51,7 @@ class UwbXyzPublisher(object):
         Enter in an infinite loop to read a data line from the serial link,
         pre-process the string and calls the publish method.
         '''
-        rate = rospy.Rate(100)      #100 Hz => 10 ms
+        # rate = rospy.Rate(100)      #100 Hz => 10 ms
         while not rospy.is_shutdown():
             try:
                 buffer = bytes()
@@ -64,14 +64,14 @@ class UwbXyzPublisher(object):
                         line = buffer.decode("ascii")
                 else :
                         line = self.serial.readline().decode("ascii")
-                
+
                 print(line)
-                        
+
                 line = line.strip()          # remove \n or \t or \r at begin or end of the str
                 line = line.replace(' ','0') # we use 2D configutaion: z value is a space
-                
+
                 self.publish(line)
-                rate.sleep()
+                # rate.sleep()
             except (ValueError, IndexError):
                 # Ignore the frame in case of any parsing error
                 rospy.loginfo("Error when parsing a frame from serial")
@@ -92,4 +92,3 @@ if __name__ == "__main__":
     node = UwbXyzPublisher()
     node.connect()
     node.run()
-    

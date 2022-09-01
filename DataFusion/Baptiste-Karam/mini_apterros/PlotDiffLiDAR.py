@@ -45,6 +45,7 @@ if __name__ == '__main__':
     data_brut = []
     data_traite_quaternion = []
     data_traite_euler = []
+    data_traite_diff = []
     time = []
 
     with open(data_file, "r", encoding="utf8") as F:
@@ -73,6 +74,7 @@ if __name__ == '__main__':
     data_brut = np.array(data_brut)
     data_traite_quaternion = np.array(data_traite_quaternion)
     data_traite_euler = np.array(data_traite_euler)
+    data_traite_diff = abs(data_traite_quaternion - data_traite_euler)*1e6
     time = np.array(time)
 
     dt_array = time[1:]-time[:-1]
@@ -89,7 +91,7 @@ if __name__ == '__main__':
     # plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
     # fig.set_size_inches((8,6))
     # fig.suptitle(f"Data from <{os.path.basename(data_file)}>", fontsize=14)
-    # marker_size = 5 if len(data_brut) <= 30 else 1
+    # marker_size = 1.5 if len(data_brut) <= 30 else 1
 
     # axe = axes[0]
     # axe.set_title("Z (ground distance in the direction of the LiDAR sight)")
@@ -139,59 +141,79 @@ if __name__ == '__main__':
     #
 
     fig = plt.figure()
-    #plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
     fig.set_size_inches((8,6))
     fig.suptitle(f"Data from <{os.path.basename(data_file)}>", fontsize=14)
     axe = plt.subplot(111)
+    marker_size = 1.5 if len(data_brut) <= 30 else 1
 
-    marker_size = 5 if len(data_brut) <= 30 else 1
-    axe.set_title("Z (ground distance in the direction of the LiDAR sight and corrected by the MTi's data)")
-    axe.plot(time, data_brut, '.:b', markersize=marker_size, linewidth=0.3, label="Z LiDAR")
-    axe.plot(time, data_traite_quaternion, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - quaternion")
-    axe.plot(time, data_traite_euler, '.:g', markersize=marker_size, linewidth=0.3, label="Z real - euler")
-    axe.set_ylabel("distance [mm]")
+    # axe.set_title("Z (ground distance in the direction of the LiDAR sight and corrected by the MTi's data)")
+    # axe.plot(time, data_brut, '.:b', markersize=marker_size, linewidth=0.3, label="Z LiDAR")
+    # axe.plot(time, data_traite_quaternion, '.:r', markersize=marker_size, linewidth=0.3, label="Z real - quaternion")
+    # axe.plot(time, data_traite_euler, '.:g', markersize=marker_size, linewidth=0.3, label="Z real - euler")
+    # axe.set_ylabel("distance [mm]")
+    # axe.set_xlabel(x_label)
+    # ymax = 1300
+    # axe.set_ylim(0, ymax)
+    # if stat:
+    #     z_mean, z_std = data_brut.mean(), data_brut.std()
+    #     z_min, z_max = data_brut.min(), data_brut.max()
+    #     text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
+    #     text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+    #     text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
+    #     print(text1)
+    #     print(text2)
+    #     box_original = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
+    #     axe.text(0, ymax*.98,
+    #              fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
+    #              fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
+    #              va='top', ha ='left', fontsize=9, bbox=box_original)
+    #
+    #     z_mean, z_std = data_traite_quaternion.mean(), data_traite_quaternion.std()
+    #     z_min, z_max = data_traite_quaternion.min(), data_traite_quaternion.max()
+    #     text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
+    #     text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+    #     text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
+    #     print(text1)
+    #     print(text2)
+    #     box_new = {'facecolor': (.9,.8,.8,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
+    #     axe.text(0, ymax*.85,
+    #              fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
+    #              fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
+    #              va='top', ha ='left', fontsize=9, bbox=box_new)
+    #
+    #     z_mean, z_std = data_traite_euler.mean(), data_traite_euler.std()
+    #     z_min, z_max = data_traite_euler.min(), data_traite_euler.max()
+    #     text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
+    #     text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+    #     text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
+    #     print(text1)
+    #     print(text2)
+    #     box_mean = {'facecolor': (.8,.9,.8,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
+    #     axe.text(0, ymax*.72,
+    #              fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
+    #              fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
+    #              va='top', ha ='left', fontsize=9, bbox=box_mean)
+
+    axe.set_title("Difference between the data processed by the quaternions and by the Euler angles")
+    axe.plot(time, data_traite_diff, '.:g', markersize=marker_size, linewidth=0.3,
+             label="Absolute value of the difference between the processed data ")
+    axe.set_ylabel("distance [nm]")
     axe.set_xlabel(x_label)
-    ymax = 1300
+    ymax = 500
     axe.set_ylim(0, ymax)
     if stat:
-        z_mean, z_std = data_brut.mean(), data_brut.std()
-        z_min, z_max = data_brut.min(), data_brut.max()
-        text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-        text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
+        z_mean, z_std = data_traite_diff.mean(), data_traite_diff.std()
+        z_min, z_max = data_traite_diff.min(), data_traite_diff.max()
+        text1 = f"z_mean: {z_mean:.1f} nm, z_std: {z_std:.1f} nm"
+        text1 += f"(min, max): ({z_min:.1f}, {z_max*.1:.1f}) nm"
         text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1)
         print(text2)
         box_original = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
         axe.text(0, ymax*.98,
-                 fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
+                 fr"mean$_z$: {z_mean:.1f} nm, $\sigma_z$: {z_std:.1f} nm, " +
+                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min:.1f}, {z_max:.1f}) nm"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box_original)
-
-        z_mean, z_std = data_traite_quaternion.mean(), data_traite_quaternion.std()
-        z_min, z_max = data_traite_quaternion.min(), data_traite_quaternion.max()
-        text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-        text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
-        text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
-        print(text1)
-        print(text2)
-        box_new = {'facecolor': (.9,.8,.8,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
-        axe.text(0, ymax*.85,
-                 fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box_new)
-
-        z_mean, z_std = data_traite_euler.mean(), data_traite_euler.std()
-        z_min, z_max = data_traite_euler.min(), data_traite_euler.max()
-        text1 = f"z_mean: {z_mean*.1:.1f} cm, z_std: {z_std*.1:.1f} cm"
-        text1 += f"(min, max): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"
-        text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
-        print(text1)
-        print(text2)
-        box_mean = {'facecolor': (.8,.9,.8,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
-        axe.text(0, ymax*.72,
-                 fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
-                 fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box_mean)
     axe.grid(True)
     axe.legend()
 

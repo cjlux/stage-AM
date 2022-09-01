@@ -17,7 +17,8 @@ class LiDAR_publisher(object):
 
     LIDAR_MODE = {'GOOD_ACCURACY': 33,
                   'BEST_ACCURACY': 200,
-                  'HIGH_SPEED': 20}
+                  'HIGH_SPEED': 20,
+                  'VERY_HIGH_SPEED': 10}
 
     def __init__(self, mode):
         '''
@@ -56,13 +57,13 @@ class LiDAR_publisher(object):
         '''
         Publish the data on the topic
         '''
-        self.publisher.publish(f"{rospy.get_time()},{tof.distance*10}")     # Conversion : cm -> mm 
+        self.publisher.publish(f"{rospy.get_time()},{tof.distance*10}")     # Conversion : cm -> mm
 
 
 if __name__ == '__main__':
-    
+
     # Old Version :
-    
+
     # parser = argparse.ArgumentParser()
     # parser = parser.replace(":="," ")
     # parser.add_argument("--lidar_mode", "--lidar_mode:=", type=str, default="",
@@ -70,14 +71,13 @@ if __name__ == '__main__':
     # args = parser.parse_args()
     # lidar_mode = args.lidar_mode
     # lidar_mode = lidar_mode.upper()
-    
-    # New Version :    
-    
+
+    # New Version :
+
     lidar_mode = rospy.get_param('publisher_lidar/lidar_mode')
-    
+
     if lidar_mode in LiDAR_publisher.LIDAR_MODE.keys():
         node = LiDAR_publisher(lidar_mode)
         node.run()
     else:
         print("Error: mode <{lidar_mode}> unknown.\nUse one of ", format(LiDAR_publisher.LIDAR_MODE.keys()))
-
