@@ -131,7 +131,7 @@ def kalman_function():
                 continue           # skip comment lines
 
     measurements = np.array(measurements)
-    X, Y, Z = measurements[:,0], measurements[:,1], measurements[:,2]
+    X, Y, Z = measurements[:,0]*10, measurements[:,1]*10, measurements[:,2]
 
     time = np.array(time)
     dt_array = time[1:]-time[:-1]
@@ -182,7 +182,8 @@ def kalman_function():
     fig.set_size_inches((8,6))
     fig.suptitle(f"Data from <{os.path.basename(data_file)}>", fontsize=14)
     marker_size = 1.5 if len(measurements) <= 30 else 1
-    ymax = 1500
+    ymax_position = 3500
+    ymax_height = 1500
     ymin = -500
 
     axe = axes[0]
@@ -191,7 +192,7 @@ def kalman_function():
     axe.plot(time, predictions_x, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
-    axe.set_ylim(ymin, ymax)
+    axe.set_ylim(ymin, ymax_position)
     if stat:
         x_mean_measurement, x_std_measurement = X.mean(), X.std()
         x_min_measurement, x_max_measurement = X.min(), X.max()
@@ -209,11 +210,11 @@ def kalman_function():
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax_position*.98,
                  fr"mean$_x$: {x_mean_measurement:.1f} cm, $\sigma_x$: {x_std_measurement:.1f} cm, " +
                  fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_measurement:.1f}, {x_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
-        axe.text(0, ymax*.65,
+        axe.text(0, ymax_position*.65,
                  fr"mean$_x$: {x_mean_prediction:.1f} cm, $\sigma_x$: {x_std_prediction:.1f} cm, " +
                  fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_prediction:.1f}, {x_max_prediction:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
@@ -226,7 +227,7 @@ def kalman_function():
     axe.plot(time, predictions_y, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
-    axe.set_ylim(ymin, ymax)
+    axe.set_ylim(ymin, ymax_position)
     if stat:
         y_mean_measurement, y_std_measurement = Y.mean(), Y.std()
         y_min_measurement, y_max_measurement = Y.min(), Y.max()
@@ -244,11 +245,11 @@ def kalman_function():
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax_position*.98,
                  fr"mean$_y$: {y_mean_measurement:.1f} cm, $\sigma_y$: {y_std_measurement:.1f} cm, " +
                  fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_measurement:.1f}, {y_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
-        axe.text(0, ymax*.65,
+        axe.text(0, ymax_position*.65,
                  fr"mean$_y$: {y_mean_prediction:.1f} cm, $\sigma_y$: {y_std_prediction:.1f} cm, " +
                  fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_prediction:.1f}, {y_max_prediction:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
@@ -261,7 +262,7 @@ def kalman_function():
     axe.plot(time, predictions_z, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
-    axe.set_ylim(0, ymax)
+    axe.set_ylim(0, ymax_height)
     if stat:
         z_mean_measurement, z_std_measurement = Z.mean(), Z.std()
         z_min_measurement, z_max_measurement = Z.min(), Z.max()
@@ -279,11 +280,11 @@ def kalman_function():
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax_height*.98,
                  fr"mean$_z$: {z_mean_measurement*.1:.1f} cm, $\sigma_z$: {z_std_measurement*.1:.1f} cm, " +
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min_measurement*.1:.1f}, {z_max_measurement*.1:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
-        axe.text(0, ymax*.73,
+        axe.text(0, ymax_height*.73,
                  fr"mean$_z$: {z_mean_prediction*.1:.1f} cm, $\sigma_z$: {z_std_prediction*.1:.1f} cm, " +
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min_prediction*.1:.1f}, {z_max_prediction*.1:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
