@@ -142,7 +142,7 @@ def kalman_function():
         x_label = "rank"
     else:
         time -= time[0]
-        x_label = "time [second]"
+        x_label = "Time [s]"
 
     # Initialization of the parameters necessary to use the Kalman filter, in
     # the three dimensions of the space. Note that the noise of the process w is
@@ -195,8 +195,8 @@ def kalman_function():
     if stat:
         x_mean_measurement, x_std_measurement = X.mean(), X.std()
         x_min_measurement, x_max_measurement = X.min(), X.max()
-        text1_measurement = f"x_mean_measurement: {x_mean_measurement*.1:.1f} cm, x_std_measurement: {x_std_measurement*.1:.1f} cm"
-        text1_measurement += f"(min, max): ({x_min_measurement*.1:.1f}, {x_max_measurement*.1:.1f}) cm"
+        text1_measurement = f"x_mean_measurement: {x_mean_measurement:.1f} cm, x_std_measurement: {x_std_measurement:.1f} cm"
+        text1_measurement += f"(min, max): ({x_min_measurement:.1f}, {x_max_measurement:.1f}) cm"
         text2_measurement = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1_measurement)
         print(text2_measurement)
@@ -204,18 +204,18 @@ def kalman_function():
 
         x_mean_prediction, x_std_prediction = predictions_x.mean(), predictions_x.std()
         x_min_prediction, x_max_prediction = predictions_x.min(), predictions_x.max()
-        text1_prediction = f"x_mean_prediction: {x_mean_prediction*.1:.1f} cm, x_std_prediction: {x_std_prediction*.1:.1f} cm"
-        text1_prediction += f"(min, max): ({x_min_prediction*.1:.1f}, {x_max_prediction*.1:.1f}) cm"
+        text1_prediction = f"x_mean_prediction: {x_mean_prediction:.1f} cm, x_std_prediction: {x_std_prediction:.1f} cm"
+        text1_prediction += f"(min, max): ({x_min_prediction:.1f}, {x_max_prediction:.1f}) cm"
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
         axe.text(0, ymax*.98,
-                 fr"mean$_x$: {x_mean_measurement*.1:.1f} cm, $\sigma_x$: {x_std_measurement*.1:.1f} cm, " +
-                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_measurement*.1:.1f}, {x_max_measurement*.1:.1f}) cm"+ "\n" + text2_measurement,
+                 fr"mean$_x$: {x_mean_measurement:.1f} cm, $\sigma_x$: {x_std_measurement:.1f} cm, " +
+                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_measurement:.1f}, {x_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
         axe.text(0, ymax*.65,
-                 fr"mean$_x$: {x_mean_prediction*.1:.1f} cm, $\sigma_x$: {x_std_prediction*.1:.1f} cm, " +
-                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_prediction*.1:.1f}, {x_max_prediction*.1:.1f}) cm",
+                 fr"mean$_x$: {x_mean_prediction:.1f} cm, $\sigma_x$: {x_std_prediction:.1f} cm, " +
+                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_prediction:.1f}, {x_max_prediction:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
     axe.grid(True)
     axe.legend()
@@ -230,8 +230,8 @@ def kalman_function():
     if stat:
         y_mean_measurement, y_std_measurement = Y.mean(), Y.std()
         y_min_measurement, y_max_measurement = Y.min(), Y.max()
-        text1_measurement = f"y_mean_measurement: {y_mean_measurement*.1:.1f} cm, y_std_measurement: {y_std_measurement*.1:.1f} cm"
-        text1_measurement += f"(min, max): ({y_min_measurement*.1:.1f}, {y_max_measurement*.1:.1f}) cm"
+        text1_measurement = f"y_mean_measurement: {y_mean_measurement:.1f} cm, y_std_measurement: {y_std_measurement:.1f} cm"
+        text1_measurement += f"(min, max): ({y_min_measurement:.1f}, {y_max_measurement:.1f}) cm"
         text2_measurement = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1_measurement)
         print(text2_measurement)
@@ -239,18 +239,18 @@ def kalman_function():
 
         y_mean_prediction, y_std_prediction = predictions_y.mean(), predictions_y.std()
         y_min_prediction, y_max_prediction = predictions_y.min(), predictions_y.max()
-        text1_prediction = f"y_mean_prediction: {y_mean_prediction*.1:.1f} cm, y_std_prediction: {y_std_prediction*.1:.1f} cm"
-        text1_prediction += f"(min, max): ({y_min_prediction*.1:.1f}, {y_max_prediction*.1:.1f}) cm"
+        text1_prediction = f"y_mean_prediction: {y_mean_prediction:.1f} cm, y_std_prediction: {y_std_prediction:.1f} cm"
+        text1_prediction += f"(min, max): ({y_min_prediction:.1f}, {y_max_prediction:.1f}) cm"
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
         axe.text(0, ymax*.98,
-                 fr"mean$_y$: {y_mean_measurement*.1:.1f} cm, $\sigma_y$: {y_std_measurement*.1:.1f} cm, " +
-                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_measurement*.1:.1f}, {y_max_measurement*.1:.1f}) cm"+ "\n" + text2_measurement,
+                 fr"mean$_y$: {y_mean_measurement:.1f} cm, $\sigma_y$: {y_std_measurement:.1f} cm, " +
+                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_measurement:.1f}, {y_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
         axe.text(0, ymax*.65,
-                 fr"mean$_y$: {y_mean_prediction*.1:.1f} cm, $\sigma_y$: {y_std_prediction*.1:.1f} cm, " +
-                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_prediction*.1:.1f}, {y_max_prediction*.1:.1f}) cm",
+                 fr"mean$_y$: {y_mean_prediction:.1f} cm, $\sigma_y$: {y_std_prediction:.1f} cm, " +
+                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_prediction:.1f}, {y_max_prediction:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
     axe.grid(True)
     axe.legend()

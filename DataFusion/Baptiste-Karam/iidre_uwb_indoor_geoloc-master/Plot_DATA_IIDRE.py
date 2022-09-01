@@ -35,7 +35,7 @@ if time:
     #     option = False
 
 if data_file is None:
-    # list *.txt files so the user can type in the number of the file to process:    
+    # list *.txt files so the user can type in the number of the file to process:
     while True:
         data_dir = input("Enter the path of the directory to scan for Data files [or Q for quit]... ")
         if data_dir.upper() == "Q": sys.exit()
@@ -85,7 +85,7 @@ adjusts = ((), #(left,bottom,right,top,wspace,hspace)
            (0.07,0.16,0.95,0.82,0.2,0.50),
            (0.07,0.09,0.95,0.87,0.2,0.42),
            (0.07,0.06,0.95,0.89,0.2,0.46),
-           (0.07,0.06,0.95,0.92,0.2,0.48)) 
+           (0.07,0.06,0.95,0.92,0.2,0.48))
 
 fig, axes = plt.subplots(nb_graph, 1)
 plt.subplots_adjust(*adjusts[nb_graph])
@@ -110,14 +110,14 @@ T, X, Y = data[:,0], data[:,1], data[:,2]
 T = (T - T[0])*1e-3
 
 axe.set_title("X & Y pos. versus time (Frame +MPOS)")
-axe.set_xlabel("Time [sec]")
+axe.set_xlabel("Time [s]")
 axe.set_ylabel("Position [cm]")
 label_x, label_y = "X pos", "Y pos"
 if stat:
     # Compute mean and standard deviation for t,x an y:
-    averages, std = [], []                              
+    averages, std = [], []
     nbVar = 3
-    for var in range(nbVar-1) :                   
+    for var in range(nbVar-1) :
         averages.append(data.mean(axis=0)[var+1])
         std.append(data.std(axis=0)[var+1])
     label_x += fr" (mean: {averages[0]:.2f} cm, $\sigma$: {std[0]:.2f} cm)"
@@ -174,7 +174,7 @@ if TRAJ:
     axe.set_ylabel("Y Position [cm]")
     #axe.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:6.1f}"))
     axe.grid(True)
-    
+
 #
 plt.savefig(image_file+'.png')
 plt.show()

@@ -83,7 +83,7 @@ if __name__ == '__main__':
         x_label = "rank"
     else:
         time -= time[0]
-        x_label = "time [second]"
+        x_label = "Time [s]"
 
     # fig, axes = plt.subplots(2,1)
     # plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
