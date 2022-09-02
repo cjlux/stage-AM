@@ -112,11 +112,11 @@ class miniapterros_listener:
                 
                 # Writing in file
 
+                self.log_file.write("Time-IIDRE: "+str(data_iidre.data[0])+"\n")
                 self.log_file.write("Time-MTi-30: "+str(data_mti.header)+"\n")
                 self.log_file.write("Time-LiDAR: "+str(data_lidar.data[0])+"\n")
-                self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[0])+","+
-                                                   str(data_iidre.data[1])+"\n")
-                self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
+                self.log_file.write("DATA_IIDRE:"+ str(data_iidre.data[1])+","+
+                                                   str(data_iidre.data[2])+"\n")
                 self.log_file.write("DATA_MTi-30 - quaternion:"+str(data_mti.quaternion[0])+","+
                                                                 str(data_mti.quaternion[1])+","+
                                                                 str(data_mti.quaternion[2])+","+
@@ -124,12 +124,13 @@ class miniapterros_listener:
                 self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+
                                                            str(data_mti_euler[1])+","+
                                                            str(data_mti_euler[2])+"\n")
-
-                self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[0])+","+
-                                                                          str(data_iidre.data[1])+","+
+                self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
+        
+                self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[1])+","+
+                                                                          str(data_iidre.data[2])+","+
                                                                           str(abs(height_quaternion))+"\n")
-                self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[0])+","+
-                                                                     str(data_iidre.data[1])+","+
+                self.log_file.write("Nouvelles coordonnées - euler:"+str(data_iidre.data[1])+","+
+                                                                     str(data_iidre.data[2])+","+
                                                                      str(matrix_new[2,0])+"\n"+"\n")
         else:
                 return
@@ -141,11 +142,13 @@ class miniapterros_listener:
         the distance between each anchor and the tag or the position of the tag.
         Then, it reduces the size of the data to only write in the file the information we want.
         '''
-        fb = data_iidre.data.split(":")
+        line = data_iidre.data.split(";")
+        Time = line[0].split(":")[1]
+        fb = line[1].split(":")
         fb_cmd = fb[0]
         fb_data = fb[1].split(",")
 
-        data_iidre.data = [fb_data[1], fb_data[2]]
+        data_iidre.data = [Time, fb_data[1], fb_data[2]]
 
     def parsing_lidar(self, data_lidar):
         ''' 
@@ -154,7 +157,7 @@ class miniapterros_listener:
         '''
         fb = data_lidar.data.split(",")
         data_lidar.data = fb[1]
-        data_lidar.data = int(float(data_lidar.data))
+        data_lidar.data = [fb[0], int(float(data_lidar.data))]
 
     def parsing_mti(self, data_mti):
         ''' 

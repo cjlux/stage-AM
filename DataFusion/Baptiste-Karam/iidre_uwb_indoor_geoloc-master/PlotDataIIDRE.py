@@ -77,21 +77,27 @@ with open(data_file, "r", encoding="utf8") as F:
         if line.startswith("#"):
             continue   # skip comment lines
         if line.startswith("+MPOS"):
-            tag, xyz = line.split(":")
-            t, x, y = map(float, xyz.split(',')[:3])
+            fb = line.split(";")
+            t = fb[0].split(":")[1]
+            tag, xyz = fb[1].split(":")
+            x, y = map(float, xyz.split(',')[1:])
             data.append([t,x,y])
         elif line.startswith("+DIST:"):
             # +DIST:376660,556509A9,232,0,346,170,-95274,13,
-            tag, dist = line.split(":")
+            fb = line.split(";")
+            t = fb[0].split(":")[1]
+            tag, dist = fb[1].split(":")
             anchor_id = dist.split(',')[1]
-            t, d = map(float, (dist.split(',')[0], dist.split(',')[2]))
+            d = float(dist.split(',')[2])
             if anchor_id not in distance: distance[anchor_id] = []
             distance[anchor_id].append([t,d])
         elif  line.startswith("+DIST_DBG"):
             # +DIST:376660,556509A9,232,0,346,170,-95274,13,
-            tag, dist = line.split(":")
+            fb = line.split(";")
+            t = fb[0].split(":")[1]
+            tag, dist = fb[1].split(":")
             anchor_id = dist.split(',')[1]
-            t, d = map(float, (dist.split(',')[0], dist.split(',')[2]))
+            d = float(dist.split(',')[2])
             if anchor_id not in distance_dbg: distance_dbg[anchor_id] = []
             distance_dbg[anchor_id].append([t,d])
 
