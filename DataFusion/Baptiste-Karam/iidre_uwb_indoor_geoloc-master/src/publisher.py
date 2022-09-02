@@ -83,9 +83,11 @@ class UwbXyzPublisher(object):
     def publish(self, line):
         '''
         Publish the data on the topic
-        '''
-
+        '''        
         # Part that has been modified
+        Time = rospy.get_rostime()
+        Time = Time.secs + Time.nsecs * 1e-9
+        line = f"Time:{Time}; {line}"
         self.publisher.publish(line)
 
 if __name__ == "__main__":

@@ -65,9 +65,11 @@ with open(data_file, "r", encoding="utf8") as F:
         line = line.strip()     # clean line with \r,\n... at begin or end
         if line.startswith("#"):
             continue   # skip comment lines
-        fb  = line.split(':')
-        if fb[0] == "+MPOS":
-            t, x, y = map(float, fb[1].split(',')[:3])
+        fb  = line.split(';')
+        tag, xyz = fb[1].split(":")
+        if tag == "+MPOS":
+            t = fb[0].split(":")[1]
+            x, y = map(float, xyz.split(',')[1:])
             data.append([t,x,y])
 
 # Transform the data list into np.ndarray:
