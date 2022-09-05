@@ -10,75 +10,43 @@ class KalmanFilter(object):
     This class provides the first Kalman filter estimates and those recalibrated
     using measurements from the IIDRE, LiDAR and MTi-30 sensors.
     '''
-    def __init__(self, F = None, B = None, H = None, Q = None, R = None,
-                 P = None, x0 = None, w = None):
-        '''
-        Nota Bene :
-          z0 : observation or measurement of the process
+    def __init__(self, n_elt, n_dim, variance, estimate_variance):
+        # intial parameters
+        self.n_elt = n_elt
+        self.n_dim = n_dim
+        self.sz = (self.n_elt,self.n_dim) # size of array
+        self.x = np.zeros(self.n_dim) # truth value (typo in example at top of p. 13 calls this z)
 
-        Parameters :
-          n : number of columns of F
-          m : number of lines of H
-          F : matrix that connects the previous state k-1 to the current state k
-          B : matrix that relates the control input u(k) to the state x(k), set
-          to 0 by default
-          H : matrix that relates the state x(k) to the measure z(k)
-          Q : covariance matrix of the process noise, defined by an identity
-          matrix of size n by default
-          R : covariance matrix of the measurement noise, defined by an identity
-          matrix of size m by default
-          P : estimation matrix of the covariance of the error, defined by an
-          identity matrix of size n by default
-          x0 : estimation of the state
-          w : process noise
-        '''
-        if(F is None or H is None):
-            raise ValueError("Set proper system dynamics.")
+        self.Q = np.array([[variance],
+                           [variance],
+                           [variance]]) # process variance
 
-        self.n = F.shape[1]
-        self.m = H.shape[0]
+        # allocate space for arrays
+        self.xhat = np.zeros(self.sz)      # a posteri estimate of x
+        self.P = np.zeros(self.sz)         # a posteri error estimate
+        self.xhatminus = np.zeros(self.sz) # a priori estimate of x
+        self.Pminus = np.zeros(self.sz)    # a priori error estimate
+        self.K = np.zeros(self.sz)         # gain or blending factor
 
-        self.F = F
-        self.H = H
-        self.B = 0 if B is None else B
-        self.Q = np.eye(self.n) if Q is None else Q
-        self.R = np.eye(self.m) if R is None else R
-        self.P = np.eye(self.n) if P is None else P
-        self.x = np.zeros((self.n, 1)) if x0 is None else x0
-        self.w = np.zeros((self.m, 1)) if w is None else w
+        self.R = np.array([[estimate_variance],
+                           [estimate_variance],
+                           [estimate_variance]]) # estimate of measurement variance, change to see effect
 
-    def predict(self, u = 0):
-        '''
-        It starts by determining the value of x, which defines the new predicted.
+        # intial guesses
+        self.xhat[0] = np.zeros((1,self.n_dim))
+        self.P[0] = np.ones((1,self.n_dim))
 
-        Note that, in our case, u = 0 since we only consider the position returned
-        by the sensors and not the forces applied to the tag.
+    def kalman_estimation(self, measurements) :
+        for j in range(self.n_dim):
+            for k in range(1,self.n_elt):
+                # time update
+                self.xhatminus[k][j] = self.xhat[k-1][j]
+                self.Pminus[k][j] = self.P[k-1][j]+self.Q[j]
 
-        Then, the a priori estimation matrix of the covariance of the error P is
-        calculated.
-        '''
-        self.x = np.dot(self.F, self.x) + np.dot(self.B, u) + self.w
-        self.P = np.dot(np.dot(self.F, self.P), self.F.T) + self.Q
-        return self.x
-
-    def update(self, z):
-        '''
-        The innovation is defined here as a comparison between the predicted
-        value and the measured value. The covariance associated with this column
-        matrix is also calculated.
-
-        This allows us to determine the optimal Kalman gain and thus the updated
-        state.
-
-        Finally an identity matrix of size n is initialized to update the
-        covariance matrix P.
-        '''
-        y = z - np.dot(self.H, self.x)
-        S = self.R + np.dot(self.H, np.dot(self.P, self.H.T))
-        K = np.dot(np.dot(self.P, self.H.T), np.linalg.inv(S))
-        self.x = self.x + np.dot(K, y)
-        I = np.eye(self.n)
-        self.P = np.dot(I - np.dot(K, self.H), self.P)
+                # measurement update
+                self.K[k][j] = self.Pminus[k][j]/( self.Pminus[k][j]+self.R[j] )
+                self.xhat[k][j] = self.xhatminus[k][j]+self.K[k][j]*(measurements[k][j]-self.xhatminus[k][j])
+                self.P[k][j] = (1-self.K[k][j])*self.Pminus[k][j]
 
 def kalman_function():
     '''
@@ -90,32 +58,6 @@ def kalman_function():
     start_time = time.time()
     # The lower the delta, the smoother the curve. We choosed 1/100 arbitrarily.
     delta_t = 1.0/100
-    # For the values of the matrix F, these are the values recommended by this
-    # pdf https://cnriut2019.sciencesconf.org/data/6_15H00_FA010.pdf
-    F_x = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
-    F_y = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
-    F_z = np.array([[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]])
-    H_x = np.array([1, 0, 0]).reshape(1, 3)
-    H_y = np.array([1, 0, 0]).reshape(1, 3)
-    H_z = np.array([1, 0, 0]).reshape(1, 3)
-
-    # This variable, alpha, defines the reliability of the estimate. The higher
-    # it is, the better the measurements will be corrected. A bad estimation of
-    # this variable can therefore lead to drifts. For the values of the Q matrix,
-    # these are the values recommended by the person in this forum
-    # https://robotics.stackexchange.com/questions/11178/kalman-filter-gps-imu
-    alpha = 0.1
-    Q_x = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
-    Q_y = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
-    Q_z = np.array([[alpha, 0.0, 0.0], [0.0, alpha, 0.0], [0.0, 0.0, alpha]])
-
-    # This parameters represent the initial position of the tag
-    delta_x = 140
-    delta_y = 170
-    delta_z = 20
-    P_x = np.array([[delta_x, 0.0, 0.0], [0.0, delta_x, 0.0], [0.0, 0.0, delta_x]])
-    P_y = np.array([[delta_y, 0.0, 0.0], [0.0, delta_y, 0.0], [0.0, 0.0, delta_y]])
-    P_z = np.array([[delta_z, 0.0, 0.0], [0.0, delta_z, 0.0], [0.0, 0.0, delta_z]])
 
     measurements = []
     Time = []
@@ -151,34 +93,21 @@ def kalman_function():
         x_label = "Time [s]"
 
     # Initialization of the parameters necessary to use the Kalman filter, in
-    # the three dimensions of the space. Note that the noise of the process w is
-    # defined from a Gaussian centered in 0 and of standard deviation equal to
-    # what was measured in the case of a stationary tag.
-    kf_x = KalmanFilter(F = F_x, H = H_x, Q = Q_x, P = P_x)
-    kf_y = KalmanFilter(F = F_y, H = H_y, Q = Q_y, P = P_y)
-    kf_z = KalmanFilter(F = F_z, H = H_z, Q = Q_z, P = P_z)
-    predictions_x = []
-    predictions_y = []
-    predictions_z = []
+    # the three dimensions of the space.
+    n_elt = measurements.shape[0]
+    n_dim = measurements.shape[1]
+    variance = 1e-5
+    estimate_variance = 1e-3
+    kf = KalmanFilter(n_elt, n_dim, variance, estimate_variance)
 
+    X = X.reshape(X.shape[0], 1)
+    Y = Y.reshape(Y.shape[0], 1)
+    Z = Z.reshape(Z.shape[0], 1)
+    measurements = np.concatenate((X,Y,Z), axis = 1)
     # Flow of the elements measured by the different sensors in order to update
     # the predicted data after their calculation, in the three dimensions of the
     # space.
-    for x in X:
-        predictions_x.append(np.dot(H_x,  kf_x.predict())[0])
-        kf_x.update(x)
-    for y in Y:
-        predictions_y.append(np.dot(H_y,  kf_y.predict())[0])
-        kf_y.update(y)
-    for z in Z:
-        predictions_z.append(np.dot(H_z,  kf_z.predict())[0])
-        kf_z.update(z)
-
-    # Cast of the elements of the list in array, in the three dimensions of the
-    # space.
-    predictions_x = np.array(predictions_x)
-    predictions_y = np.array(predictions_y)
-    predictions_z = np.array(predictions_z)
+    kf.kalman_estimation(measurements)
 
     fig, axes = plt.subplots(3,1)
     plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
@@ -192,7 +121,7 @@ def kalman_function():
     axe = axes[0]
     axe.set_title("X's position comparison between measurement and prediction")
     axe.plot(Time, X, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_x, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,0], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(ymin, ymax_position)
@@ -206,8 +135,8 @@ def kalman_function():
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        x_mean_prediction, x_std_prediction = predictions_x.mean(), predictions_x.std()
-        x_min_prediction, x_max_prediction = predictions_x.min(), predictions_x.max()
+        x_mean_prediction, x_std_prediction = kf.xhat[:,0].mean(), kf.xhat[:,0].std()
+        x_min_prediction, x_max_prediction = kf.xhat[:,0].min(), kf.xhat[:,0].max()
         text1_prediction = f"x_mean_prediction: {x_mean_prediction*.1:.1f} cm, x_std_prediction: {x_std_prediction*.1:.1f} cm"
         text1_prediction += f"(min, max): ({x_min_prediction*.1:.1f}, {x_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
@@ -227,7 +156,7 @@ def kalman_function():
     axe = axes[1]
     axe.set_title("Y's position comparison between measurement and prediction")
     axe.plot(Time, Y, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_y, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,1], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(ymin, ymax_position)
@@ -241,8 +170,8 @@ def kalman_function():
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        y_mean_prediction, y_std_prediction = predictions_y.mean(), predictions_y.std()
-        y_min_prediction, y_max_prediction = predictions_y.min(), predictions_y.max()
+        y_mean_prediction, y_std_prediction = kf.xhat[:,1].mean(), kf.xhat[:,1].std()
+        y_min_prediction, y_max_prediction = kf.xhat[:,1].min(), kf.xhat[:,1].max()
         text1_prediction = f"y_mean_prediction: {y_mean_prediction*.1:.1f} cm, y_std_prediction: {y_std_prediction*.1:.1f} cm"
         text1_prediction += f"(min, max): ({y_min_prediction*.1:.1f}, {y_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
@@ -262,7 +191,7 @@ def kalman_function():
     axe = axes[2]
     axe.set_title("Z's position comparison between measurement and prediction")
     axe.plot(Time, Z, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_z, '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,2], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(0, ymax_height)
@@ -276,8 +205,8 @@ def kalman_function():
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        z_mean_prediction, z_std_prediction = predictions_z.mean(), predictions_z.std()
-        z_min_prediction, z_max_prediction = predictions_z.min(), predictions_z.max()
+        z_mean_prediction, z_std_prediction = kf.xhat[:,2].mean(), kf.xhat[:,2].std()
+        z_min_prediction, z_max_prediction = kf.xhat[:,2].min(), kf.xhat[:,2].max()
         text1_prediction = f"z_mean_prediction: {z_mean_prediction*.1:.1f} cm, z_std_prediction: {z_std_prediction*.1:.1f} cm"
         text1_prediction += f"(min, max): ({z_min_prediction*.1:.1f}, {z_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
