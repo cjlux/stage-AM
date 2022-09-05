@@ -39,17 +39,16 @@ class KalmanFilter(object):
 
     def kalman_estimation(self, measurements) :
         # Update values
-        self.xhat[0][j] = self.xhat[1][j]
-        self.P[0][j] = self.P[1][j]
+        self.xhat[0][:] = self.xhat[1][:]
+        self.P[0][:] = self.P[1][:]
         for j in range(self.n_dim):
             # time update
             self.xhatminus[1][j] = self.xhat[0][j]
             self.Pminus[1][j] = self.P[0][j]+self.Q[j]
 
             # measurement update
-            self.K[1][j] = self.Pminus[1][j]/( self.Pminus[1][j]+self.R[j] )
-            self.xhat[1][j] = self.xhatminus[1][j]+self.K[1][j]*
-                                    (measurements[1][j]-self.xhatminus[1][j])
+            self.K[1][j] = self.Pminus[1][j]/(self.Pminus[1][j]+self.R[j])
+            self.xhat[1][j] = self.xhatminus[1][j]+self.K[1][j]*(measurements[j]-self.xhatminus[1][j])
             self.P[1][j] = (1-self.K[1][j])*self.Pminus[1][j]
 
 class miniapterros_listener:
@@ -144,9 +143,9 @@ class miniapterros_listener:
                 height_quaternion = vector_v.z    # Retrieve the last component of the quaternion
 
                 # Kalman filter
-                measurements = np.concatenate((data_iidre.data[1],
-                                               data_iidre.data[2],
-                                               height_quaternion), axis = 1)
+                measurements = np.concatenate(([float(data_iidre.data[1])], 
+                                               [float(data_iidre.data[2])], 
+                                               [float(height_quaternion)]), axis = 0)
                 # Flow of the elements measured by the different sensors in order to update
                 # the predicted data after their calculation, in the three dimensions of the
                 # space.
@@ -163,17 +162,10 @@ class miniapterros_listener:
                                                                 str(data_mti.quaternion[1])+","+
                                                                 str(data_mti.quaternion[2])+","+
                                                                 str(data_mti.quaternion[3])+"\n")
-                self.log_file.write("DATA_MTi-30 - euler:"+str(data_mti_euler[0])+","+
-                                                           str(data_mti_euler[1])+","+
-                                                           str(data_mti_euler[2])+"\n")
                 self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
-
-                self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[1])+","+
-                                                                          str(data_iidre.data[2])+","+
-                                                                          str(abs(height_quaternion))+"\n")
                 self.log_file.write("Coordonnées estimées - Kalman:"+str(self.kf.xhat[1,0])+","+
                                                                      str(self.kf.xhat[1,1])+","+
-                                                                     str(self.kf.xhat[1,2])+"\n")
+                                                                     str(self.kf.xhat[1,2])+"\n"+"\n")
         else:
                 return
 
