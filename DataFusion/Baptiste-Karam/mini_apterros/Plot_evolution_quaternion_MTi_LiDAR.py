@@ -100,7 +100,7 @@ if __name__ == '__main__':
         print(text2)
         box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
         axe.text(0, ymax*.98,
-                 fr"mean$_y$: {x_mean:.1f} deg, $\sigma_x$: {x_std:.1f} deg, " +
+                 fr"mean$_x$: {x_mean:.1f} deg, $\sigma_x$: {x_std:.1f} deg, " +
                  fr"(x$_{{min}}$, $x_{{max}}$): ({x_min:.1f}, {x_max:.1f}) deg"+ "\n" + text2,
                  va='top', ha ='left', fontsize=9, bbox=box)
     axe.grid(True)
