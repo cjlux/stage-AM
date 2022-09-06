@@ -15,23 +15,23 @@ class KalmanFilter(object):
     def __init__(self, n_dim, variance, estimate_variance):
         # intial parameters
         self.n_dim = n_dim
-        self.sz = (2,self.n_dim) # size of array
-        self.x = np.zeros(self.n_dim) # truth value (typo in example at top of p. 13 calls this z)
+        self.sz = (2,self.n_dim)           # size of array
+        self.x = np.zeros(self.n_dim)      # truth value (typo in example at top of p. 13 calls this z)
 
         self.Q = np.array([[variance],
                            [variance],
-                           [variance]]) # process variance
+                           [variance]])    # process variance
 
         # allocate space for arrays
-        self.xhat = np.zeros(self.sz)      # a posteri estimate of x
-        self.P = np.zeros(self.sz)         # a posteri error estimate
+        self.xhat = np.zeros(self.sz)      # a posteriori estimate of x
+        self.P = np.zeros(self.sz)         # a posteriori error estimate
         self.xhatminus = np.zeros(self.sz) # a priori estimate of x
         self.Pminus = np.zeros(self.sz)    # a priori error estimate
         self.K = np.zeros(self.sz)         # gain or blending factor
 
         self.R = np.array([[estimate_variance],
                            [estimate_variance],
-                           [estimate_variance]]) # estimate of measurement variance, change to see effect
+                           [estimate_variance]]) # estimate of measurement variance
 
         # intial guesses
         self.xhat[0] = np.zeros((1,self.n_dim))
@@ -98,9 +98,11 @@ class miniapterros_listener:
 
         # Initialization of the parameters necessary to use the Kalman filter, in
         # the three dimensions of the space.
-        n_dim = 3
-        variance = 1e-5
-        estimate_variance = 1e-3
+        n_dim = 3                   # we study the variations in X, Y and Z
+        variance = 1e-5             # process variance
+        estimate_variance = 1e-3    # estimate of measurement variance. The bigger it is,
+                                    # the more accurate the measurements are considered to be.
+                                    # The only parameter on which we can act.
         self.kf = KalmanFilter(n_dim, variance, estimate_variance)
 
 
@@ -143,8 +145,8 @@ class miniapterros_listener:
                 height_quaternion = vector_v.z    # Retrieve the last component of the quaternion
 
                 # Kalman filter
-                measurements = np.concatenate(([float(data_iidre.data[1])], 
-                                               [float(data_iidre.data[2])], 
+                measurements = np.concatenate(([float(data_iidre.data[1])],
+                                               [float(data_iidre.data[2])],
                                                [float(height_quaternion)]), axis = 0)
                 # Flow of the elements measured by the different sensors in order to update
                 # the predicted data after their calculation, in the three dimensions of the
