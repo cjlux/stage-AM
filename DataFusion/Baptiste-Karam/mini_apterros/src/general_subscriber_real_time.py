@@ -100,7 +100,7 @@ class miniapterros_listener:
         # the three dimensions of the space.
         n_dim = 3
         variance = 1e-5
-        estimate_variance = 1e-3
+        estimate_variance = 1e-4
         self.kf = KalmanFilter(n_dim, variance, estimate_variance)
 
 

@@ -97,7 +97,7 @@ def kalman_function():
     n_elt = measurements.shape[0]
     n_dim = measurements.shape[1]
     variance = 1e-5
-    estimate_variance = 1e-3
+    estimate_variance = 1e-4
     kf = KalmanFilter(n_elt, n_dim, variance, estimate_variance)
 
     X = X.reshape(X.shape[0], 1)
