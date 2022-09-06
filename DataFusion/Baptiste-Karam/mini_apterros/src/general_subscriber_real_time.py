@@ -98,9 +98,10 @@ class miniapterros_listener:
 
         # Initialization of the parameters necessary to use the Kalman filter, in
         # the three dimensions of the space.
+
         n_dim = 3                   # we study the variations in X, Y and Z
         variance = 1e-5             # process variance
-        estimate_variance = 1e-3    # estimate of measurement variance. The bigger it is,
+        estimate_variance = 1e-4    # estimate of measurement variance. The bigger it is,
                                     # the more accurate the measurements are considered to be.
                                     # The only parameter on which we can act.
         self.kf = KalmanFilter(n_dim, variance, estimate_variance)

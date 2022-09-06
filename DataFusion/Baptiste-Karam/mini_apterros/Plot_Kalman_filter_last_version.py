@@ -10,11 +10,11 @@ class KalmanFilter(object):
     This class provides the first Kalman filter estimates and those recalibrated
     using measurements from the IIDRE, LiDAR and MTi-30 sensors.
     '''
-    def __init__(self, n_elt, truth_value, variance, estimate_variance):
+    def __init__(self, n_elt, variance, estimate_variance):
         # intial parameters
         self.n_elt = n_elt
         self.sz = (self.n_elt,) # size of array
-        self.x = truth_value # truth value (typo in example at top of p. 13 calls this z)
+        self.x = 0 # truth value (typo in example at top of p. 13 calls this z)
 
         self.Q = variance # process variance
 
@@ -89,12 +89,11 @@ def kalman_function():
     # Initialization of the parameters necessary to use the Kalman filter, in
     # the three dimensions of the space.
     n_elt = measurements.shape[0]
-    truth_value = 0
-    variance = 0.1
-    estimate_variance = 0.01
-    kf_x = KalmanFilter(n_elt, truth_value, variance, estimate_variance)
-    kf_y = KalmanFilter(n_elt, truth_value, variance, estimate_variance)
-    kf_z = KalmanFilter(n_elt, truth_value, variance, estimate_variance)
+    variance = 1e-5
+    estimate_variance = 1e-4
+    kf_x = KalmanFilter(n_elt, variance, estimate_variance)
+    kf_y = KalmanFilter(n_elt, variance, estimate_variance)
+    kf_z = KalmanFilter(n_elt, variance, estimate_variance)
 
     # Flow of the elements measured by the different sensors in order to update
     # the predicted data after their calculation, in the three dimensions of the
