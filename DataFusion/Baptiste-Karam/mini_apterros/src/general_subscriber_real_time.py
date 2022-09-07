@@ -13,6 +13,12 @@ class KalmanFilter(object):
     using measurements from the IIDRE, LiDAR and MTi-30 sensors.
     '''
     def __init__(self, n_dim, variance, estimate_variance):
+        '''
+        Parameters :
+          n_dim : Number of dimensions in which the vehicle evolves
+          variance : Variance of the error related to the Kalman filter processing
+          estimate_variance : Variance of the sensor measurement error 
+        '''
         # intial parameters
         self.n_dim = n_dim
         self.sz = (2,self.n_dim)           # size of array
@@ -38,6 +44,11 @@ class KalmanFilter(object):
         self.P[0] = np.ones((1,self.n_dim))
 
     def kalman_estimation(self, measurements) :
+        '''
+        It updates the lists of estimates a posteriori by copying the data in the first box of the tables.
+        It goes through the three dimensions one by one and runs the Kalman filter formulas to obtain the 
+        new estimates.
+        '''
         # Update values
         self.xhat[0][:] = self.xhat[1][:]
         self.P[0][:] = self.P[1][:]
@@ -110,17 +121,18 @@ class miniapterros_listener:
     def callback(self, data_iidre, data_lidar, data_mti):
         '''
         It calls 3 parsing() function for the sensors to keep just data we need.
-        It contains a conversion function to get euler angles from quaternion.
         Then, it  writes a message in rospy.loginfo about the data
         it hears (when the verbose variable is set to True).
         Then, it writes the data in the file in blocs :
-             Time
+             Time-IIDRE
+             Time-MTi-30
+             Time-LiDAR
              IIDRE_DATA
+             MTi_DATA
              LiDAR_DATA
-             MTi_DATA (quaternion and Euler angles)
 
              New_treated_coordinates (using quaternion)
-             New_treated_coordinates (using angles of Euler)
+             New_estimation_coordinates (using Kalman filter)
         '''
 
         if self.log_file.closed == False:
@@ -166,6 +178,9 @@ class miniapterros_listener:
                                                                 str(data_mti.quaternion[2])+","+
                                                                 str(data_mti.quaternion[3])+"\n")
                 self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
+                self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[1])+","+
+                                                                          str(data_iidre.data[2])+","+
+                                                                          str(height_quaternion)+"\n"+"\n")
                 self.log_file.write("Coordonnées estimées - Kalman:"+str(self.kf.xhat[1,0])+","+
                                                                      str(self.kf.xhat[1,1])+","+
                                                                      str(self.kf.xhat[1,2])+"\n"+"\n")

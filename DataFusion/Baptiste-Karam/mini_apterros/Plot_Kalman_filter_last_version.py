@@ -11,6 +11,12 @@ class KalmanFilter(object):
     using measurements from the IIDRE, LiDAR and MTi-30 sensors.
     '''
     def __init__(self, n_elt, variance, estimate_variance):
+        '''
+        Parameters :
+          n_dim : Number of dimensions in which the vehicle evolves
+          variance : Variance of the error related to the Kalman filter processing
+          estimate_variance : Variance of the sensor measurement error 
+        '''
         # intial parameters
         self.n_elt = n_elt
         self.sz = (self.n_elt,) # size of array
@@ -32,6 +38,9 @@ class KalmanFilter(object):
         self.P[0] = 1.0
 
     def kalman_estimation(self, measurements) :
+        '''
+        It runs the Kalman filter formulas to obtain the new estimate.
+        '''
         for k in range(1,self.n_elt):
             # time update
             self.xhatminus[k] = self.xhat[k-1]

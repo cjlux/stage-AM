@@ -73,7 +73,7 @@ class Plot_IMU(object):
            the options chosen (--type_info and --stat).
         '''
 
-        if type_info == "euler" or type_info = "angular_velocity":
+        if type_info == "euler" or type_info == "angular_velocity":
             data[:,1:] = np.degrees(data[:,1:])
 
         X, Y, Z = data[:,1], data[:,2], data[:,3]
@@ -98,18 +98,18 @@ class Plot_IMU(object):
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            x_mean, x_std = X.mean()*10, X.std()*10
-            x_min, x_max = X.min()*10, X.max()*10
+            x_mean, x_std = X.mean(), X.std()
+            x_min, x_max = X.min(), X.max()
             text1 = f"x_mean: {x_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, x_std: {x_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text1 += f"(min, max): ({x_min:.1f}, {x_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
-            axe.text(0, ymax*.98,
+            axe.text(0, -ymax*.94,
                      fr"mean$_x$: {x_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_x$: {x_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(x$_{{min}}$, $x_{{max}}$): ({x_min:.1f}, {x_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='top', ha ='left', fontsize=9, bbox=box)
+                     va='bottom', ha ='left', fontsize=18, bbox=box)
         axe.legend()
         axe.grid(True)
 
@@ -120,18 +120,18 @@ class Plot_IMU(object):
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            y_mean, y_std = Y.mean()*10, Y.std()*10
-            y_min, y_max = Y.min()*10, Y.max()*10
+            y_mean, y_std = Y.mean(), Y.std()
+            y_min, y_max = Y.min(), Y.max()
             text1 = f"y_mean: {y_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, y_std: {y_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text1 += f"(min, max): ({y_min:.1f}, {y_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
-            axe.text(0, ymax*.98,
+            axe.text(0, ymax*.94,
                      fr"mean$_y$: {y_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_y$: {y_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(y$_{{min}}$, $y_{{max}}$): ({y_min:.1f}, {y_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='top', ha ='left', fontsize=9, bbox=box)
+                     va='top', ha ='left', fontsize=18, bbox=box)
         axe.legend()
         axe.grid(True)
 
@@ -142,18 +142,18 @@ class Plot_IMU(object):
         axe.set_xlabel("Time [s]")
         axe.set_ylabel(fr"{Plot_IMU.TYPE_INFO[self.type_info][0]} [{Plot_IMU.TYPE_INFO[self.type_info][4]}]")
         if self.stat:
-            z_mean, z_std = Z.mean()*10, Z.std()*10
-            z_min, z_max = Z.min()*10, Z.max()*10
+            z_mean, z_std = Z.mean(), Z.std()
+            z_min, z_max = Z.min(), Z.max()
             text1 = f"z_mean: {z_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, z_std: {z_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text1 += f"(min, max): ({z_min:.1f}, {z_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"
             text2 = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
             print(text1)
             print(text2)
             box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
-            axe.text(0, ymax*.98,
+            axe.text(0, ymax*.94,
                      fr"mean$_z$: {z_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_z$: {z_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(z$_{{min}}$, $z_{{max}}$): ({z_min:.1f}, {z_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='top', ha ='left', fontsize=9, bbox=box)
+                     va='top', ha ='left', fontsize=18, bbox=box)
         axe.legend()
         axe.grid(True)
         #

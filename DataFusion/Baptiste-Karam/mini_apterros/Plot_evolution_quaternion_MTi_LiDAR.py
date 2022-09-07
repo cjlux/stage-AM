@@ -99,10 +99,10 @@ if __name__ == '__main__':
         print(text1)
         print(text2)
         box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax*.94,
                  fr"mean$_x$: {x_mean:.1f} deg, $\sigma_x$: {x_std:.1f} deg, " +
                  fr"(x$_{{min}}$, $x_{{max}}$): ({x_min:.1f}, {x_max:.1f}) deg"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box)
+                 va='top', ha ='left', fontsize=14, bbox=box)
     axe.grid(True)
     axe.legend()
 
@@ -122,10 +122,10 @@ if __name__ == '__main__':
         print(text1)
         print(text2)
         box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax*.94,
                  fr"mean$_y$: {y_mean:.1f} deg, $\sigma_y$: {y_std:.1f} deg, " +
                  fr"(y$_{{min}}$, $y_{{max}}$): ({y_min:.1f}, {y_max:.1f}) deg"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box)
+                 va='top', ha ='left', fontsize=14, bbox=box)
     axe.grid(True)
     axe.legend()
 
@@ -145,10 +145,10 @@ if __name__ == '__main__':
         print(text1)
         print(text2)
         box = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'green', 'boxstyle': 'square'}
-        axe.text(0, ymax*.98,
+        axe.text(0, ymax*.94,
                  fr"mean$_z$: {z_mean:.1f} deg, $\sigma_z$: {z_std:.1f} deg, " +
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min:.1f}, {z_max:.1f}) deg"+ "\n" + text2,
-                 va='top', ha ='left', fontsize=9, bbox=box)
+                 va='top', ha ='left', fontsize=14, bbox=box)
     axe.grid(True)
     axe.legend()
 
