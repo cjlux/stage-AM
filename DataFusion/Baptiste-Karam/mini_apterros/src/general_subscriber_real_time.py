@@ -15,9 +15,9 @@ class KalmanFilter(object):
     def __init__(self, n_dim, variance, estimate_variance):
         '''
         Parameters :
-          n_dim : Number of dimensions in which the vehicle evolves
-          variance : Variance of the error related to the Kalman filter processing
-          estimate_variance : Variance of the sensor measurement error 
+          n_dim: Number of dimensions in which the vehicle evolves
+          variance: Variance of the error related to the Kalman filter processing
+          estimate_variance: Variance of the sensor measurement error
         '''
         # intial parameters
         self.n_dim = n_dim
@@ -46,7 +46,7 @@ class KalmanFilter(object):
     def kalman_estimation(self, measurements) :
         '''
         It updates the lists of estimates a posteriori by copying the data in the first box of the tables.
-        It goes through the three dimensions one by one and runs the Kalman filter formulas to obtain the 
+        It goes through the three dimensions one by one and runs the Kalman filter formulas to obtain the
         new estimates.
         '''
         # Update values
@@ -70,23 +70,23 @@ class miniapterros_listener:
     '''
     def __init__(self, log_file, verbose=False):
         '''
-        Parameters :
-          log_file : the file where the data are stored
-          verbose : define if there will be messages printed in the terminal
-        Functions :
-          message_filters.Subscriber takes in parameters : the topic on which it is registered
+        Parameters:
+          log_file: the file where the data are stored
+          verbose: define if there will be messages printed in the terminal
+        Functions:
+          message_filters.Subscriber takes in parameters: the topic on which it is registered
           as a subscriber and the given type of the messages.
 
           message_filters.ApproximateTimeSynchronizer() synchronizes messages by their timestamp,
           only pass them through when all have arrived
 
-          Parameters :
+          Parameters:
               a list of multiple subscribers,
-              queue size : sets of messages should be stored from each input filter
+              queue size: sets of messages should be stored from each input filter
                            (by timestamp) while waiting for all messages to arrive,
-              slop : delay in secondes with which messages can be synchronized,
-              allow_headerless : allow the access to different headers in order
-                                 to have the TimeStamped for each sensor.
+              slop: delay in secondes with which messages can be synchronized,
+              allow_headerless: allow the access to different headers in order
+                                to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
         self.log_file = log_file
@@ -112,9 +112,9 @@ class miniapterros_listener:
 
         n_dim = 3                   # we study the variations in X, Y and Z
         variance = 1e-5             # process variance
+        # THE ONLY PARAMETER ON WHICH WE CAN ACT:
         estimate_variance = 1e-4    # estimate of measurement variance. The bigger it is,
                                     # the more accurate the measurements are considered to be.
-                                    # The only parameter on which we can act.
         self.kf = KalmanFilter(n_dim, variance, estimate_variance)
 
 
