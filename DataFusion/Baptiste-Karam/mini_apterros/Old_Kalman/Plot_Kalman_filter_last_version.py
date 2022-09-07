@@ -225,7 +225,7 @@ def kalman_function():
     axe.grid(True)
     axe.legend()
     print("--- %s seconds ---" % (time.time() - start_time))
-    plt.savefig(data_file.replace('.txt','.png'))
+    plt.savefig(data_file.replace('.txt','.png'), dpi=160)
     plt.show()
 
 if __name__ == '__main__':

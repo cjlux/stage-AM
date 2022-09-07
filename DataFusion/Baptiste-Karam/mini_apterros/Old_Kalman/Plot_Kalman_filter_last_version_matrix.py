@@ -1,9 +1,62 @@
-# source : https://pykalman.github.io/
+# source : https://github.com/zziz/kalman-filter
+
 
 import matplotlib.pyplot as plt
 import numpy as np
-from pykalman import KalmanFilter
-import argparse, os, time
+import argparse, os, random, time
+
+class KalmanFilter(object):
+    '''
+    This class provides the first Kalman filter estimates and those recalibrated
+    using measurements from the IIDRE, LiDAR and MTi-30 sensors.
+    '''
+    def __init__(self, n_elt, n_dim, variance, estimate_variance):
+        '''
+        Parameters :
+          n_dim : Number of dimensions in which the vehicle evolves
+          variance : Variance of the error related to the Kalman filter processing
+          estimate_variance : Variance of the sensor measurement error 
+        '''
+        # intial parameters
+        self.n_elt = n_elt
+        self.n_dim = n_dim
+        self.sz = (self.n_elt,self.n_dim) # size of array
+        self.x = np.zeros(self.n_dim) # truth value (typo in example at top of p. 13 calls this z)
+
+        self.Q = np.array([[variance],
+                           [variance],
+                           [variance]]) # process variance
+
+        # allocate space for arrays
+        self.xhat = np.zeros(self.sz)      # a posteri estimate of x
+        self.P = np.zeros(self.sz)         # a posteri error estimate
+        self.xhatminus = np.zeros(self.sz) # a priori estimate of x
+        self.Pminus = np.zeros(self.sz)    # a priori error estimate
+        self.K = np.zeros(self.sz)         # gain or blending factor
+
+        self.R = np.array([[estimate_variance],
+                           [estimate_variance],
+                           [estimate_variance]]) # estimate of measurement variance, change to see effect
+
+        # intial guesses
+        self.xhat[0] = np.zeros((1,self.n_dim))
+        self.P[0] = np.ones((1,self.n_dim))
+
+    def kalman_estimation(self, measurements) :
+        '''
+        It goes through the three dimensions one by one and runs the Kalman filter formulas to obtain the 
+        new estimates.
+        '''
+        for j in range(self.n_dim):
+            for k in range(1,self.n_elt):
+                # time update
+                self.xhatminus[k][j] = self.xhat[k-1][j]
+                self.Pminus[k][j] = self.P[k-1][j]+self.Q[j]
+
+                # measurement update
+                self.K[k][j] = self.Pminus[k][j]/( self.Pminus[k][j]+self.R[j] )
+                self.xhat[k][j] = self.xhatminus[k][j]+self.K[k][j]*(measurements[k][j]-self.xhatminus[k][j])
+                self.P[k][j] = (1-self.K[k][j])*self.Pminus[k][j]
 
 def kalman_function():
     '''
@@ -13,6 +66,8 @@ def kalman_function():
     '''
     # Get the time of program's execution
     start_time = time.time()
+    # The lower the delta, the smoother the curve. We choosed 1/100 arbitrarily.
+    delta_t = 1.0/100
 
     measurements = []
     Time = []
@@ -47,21 +102,22 @@ def kalman_function():
         Time -= Time[0]
         x_label = "Time [s]"
 
-    delta_t = 1.0/60
-    kf_x = KalmanFilter(transition_matrices = [[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]],
-                        observation_matrices = [1, 0, 0])
-    kf_x = kf_x.em(X, n_iter=1)
-    (predictions_x, filtered_state_covariances_x) = kf_x.filter(X)
+    # Initialization of the parameters necessary to use the Kalman filter, in
+    # the three dimensions of the space.
+    n_elt = measurements.shape[0]
+    n_dim = measurements.shape[1]
+    variance = 1e-5
+    estimate_variance = 1e-4
+    kf = KalmanFilter(n_elt, n_dim, variance, estimate_variance)
 
-    kf_y = KalmanFilter(transition_matrices = [[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]],
-                        observation_matrices = [1, 0, 0])
-    kf_y = kf_y.em(Y, n_iter=1)
-    (predictions_y, filtered_state_covariances_y) = kf_y.filter(Y)
-
-    kf_z = KalmanFilter(transition_matrices = [[1, delta_t, 0], [0, 1, delta_t], [0, 0, 1]],
-                        observation_matrices = [1, 0, 0])
-    kf_z = kf_z.em(Z, n_iter=1)
-    (predictions_z, filtered_state_covariances_z) = kf_z.filter(Z)
+    X = X.reshape(X.shape[0], 1)
+    Y = Y.reshape(Y.shape[0], 1)
+    Z = Z.reshape(Z.shape[0], 1)
+    measurements = np.concatenate((X,Y,Z), axis = 1)
+    # Flow of the elements measured by the different sensors in order to update
+    # the predicted data after their calculation, in the three dimensions of the
+    # space.
+    kf.kalman_estimation(measurements)
 
     fig, axes = plt.subplots(3,1)
     plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
@@ -75,34 +131,34 @@ def kalman_function():
     axe = axes[0]
     axe.set_title("X's position comparison between measurement and prediction")
     axe.plot(Time, X, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_x[:,0], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,0], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(ymin, ymax_position)
     if stat:
         x_mean_measurement, x_std_measurement = X.mean(), X.std()
         x_min_measurement, x_max_measurement = X.min(), X.max()
-        text1_measurement = f"x_mean_measurement: {x_mean_measurement:.1f} cm, x_std_measurement: {x_std_measurement:.1f} cm"
-        text1_measurement += f"(min, max): ({x_min_measurement:.1f}, {x_max_measurement:.1f}) cm"
+        text1_measurement = f"x_mean_measurement: {x_mean_measurement*.1:.1f} cm, x_std_measurement: {x_std_measurement*.1:.1f} cm"
+        text1_measurement += f"(min, max): ({x_min_measurement*.1:.1f}, {x_max_measurement*.1:.1f}) cm"
         text2_measurement = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1_measurement)
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        x_mean_prediction, x_std_prediction = predictions_x[:,0].mean(), predictions_x[:,0].std()
-        x_min_prediction, x_max_prediction = predictions_x[:,0].min(), predictions_x[:,0].max()
-        text1_prediction = f"x_mean_prediction: {x_mean_prediction:.1f} cm, x_std_prediction: {x_std_prediction:.1f} cm"
-        text1_prediction += f"(min, max): ({x_min_prediction:.1f}, {x_max_prediction:.1f}) cm"
+        x_mean_prediction, x_std_prediction = kf.xhat[:,0].mean(), kf.xhat[:,0].std()
+        x_min_prediction, x_max_prediction = kf.xhat[:,0].min(), kf.xhat[:,0].max()
+        text1_prediction = f"x_mean_prediction: {x_mean_prediction*.1:.1f} cm, x_std_prediction: {x_std_prediction*.1:.1f} cm"
+        text1_prediction += f"(min, max): ({x_min_prediction*.1:.1f}, {x_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
         axe.text(0, ymax_position*.98,
-                 fr"mean$_x$: {x_mean_measurement:.1f} cm, $\sigma_x$: {x_std_measurement:.1f} cm, " +
-                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_measurement:.1f}, {x_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
+                 fr"mean$_x$: {x_mean_measurement*.1:.1f} cm, $\sigma_x$: {x_std_measurement*.1:.1f} cm, " +
+                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_measurement*.1:.1f}, {x_max_measurement*.1:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
         axe.text(0, ymax_position*.65,
-                 fr"mean$_x$: {x_mean_prediction:.1f} cm, $\sigma_x$: {x_std_prediction:.1f} cm, " +
-                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_prediction:.1f}, {x_max_prediction:.1f}) cm",
+                 fr"mean$_x$: {x_mean_prediction*.1:.1f} cm, $\sigma_x$: {x_std_prediction*.1:.1f} cm, " +
+                 fr"(x$_{{min}}$, $x_{{max}}$): ({x_min_prediction*.1:.1f}, {x_max_prediction*.1:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
     axe.grid(True)
     axe.legend()
@@ -110,34 +166,34 @@ def kalman_function():
     axe = axes[1]
     axe.set_title("Y's position comparison between measurement and prediction")
     axe.plot(Time, Y, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_y[:,0], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,1], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(ymin, ymax_position)
     if stat:
         y_mean_measurement, y_std_measurement = Y.mean(), Y.std()
         y_min_measurement, y_max_measurement = Y.min(), Y.max()
-        text1_measurement = f"y_mean_measurement: {y_mean_measurement:.1f} cm, y_std_measurement: {y_std_measurement:.1f} cm"
-        text1_measurement += f"(min, max): ({y_min_measurement:.1f}, {y_max_measurement:.1f}) cm"
+        text1_measurement = f"y_mean_measurement: {y_mean_measurement*.1:.1f} cm, y_std_measurement: {y_std_measurement*.1:.1f} cm"
+        text1_measurement += f"(min, max): ({y_min_measurement*.1:.1f}, {y_max_measurement*.1:.1f}) cm"
         text2_measurement = f"dt[0]: {dt:.1f} ms (mean, std):({dt_mean:.1f}, {dt_std:.1f}) ms"
         print(text1_measurement)
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        y_mean_prediction, y_std_prediction = predictions_y[:,0].mean(), predictions_y[:,0].std()
-        y_min_prediction, y_max_prediction = predictions_y[:,0].min(), predictions_y[:,0].max()
-        text1_prediction = f"y_mean_prediction: {y_mean_prediction:.1f} cm, y_std_prediction: {y_std_prediction:.1f} cm"
-        text1_prediction += f"(min, max): ({y_min_prediction:.1f}, {y_max_prediction:.1f}) cm"
+        y_mean_prediction, y_std_prediction = kf.xhat[:,1].mean(), kf.xhat[:,1].std()
+        y_min_prediction, y_max_prediction = kf.xhat[:,1].min(), kf.xhat[:,1].max()
+        text1_prediction = f"y_mean_prediction: {y_mean_prediction*.1:.1f} cm, y_std_prediction: {y_std_prediction*.1:.1f} cm"
+        text1_prediction += f"(min, max): ({y_min_prediction*.1:.1f}, {y_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
         box_prediction = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'red', 'boxstyle': 'square'}
 
         axe.text(0, ymax_position*.98,
-                 fr"mean$_y$: {y_mean_measurement:.1f} cm, $\sigma_y$: {y_std_measurement:.1f} cm, " +
-                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_measurement:.1f}, {y_max_measurement:.1f}) cm"+ "\n" + text2_measurement,
+                 fr"mean$_y$: {y_mean_measurement*.1:.1f} cm, $\sigma_y$: {y_std_measurement*.1:.1f} cm, " +
+                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_measurement*.1:.1f}, {y_max_measurement*.1:.1f}) cm"+ "\n" + text2_measurement,
                  va='top', ha ='left', fontsize=9, bbox=box_measurement)
         axe.text(0, ymax_position*.65,
-                 fr"mean$_y$: {y_mean_prediction:.1f} cm, $\sigma_y$: {y_std_prediction:.1f} cm, " +
-                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_prediction:.1f}, {y_max_prediction:.1f}) cm",
+                 fr"mean$_y$: {y_mean_prediction*.1:.1f} cm, $\sigma_y$: {y_std_prediction*.1:.1f} cm, " +
+                 fr"(y$_{{min}}$, $y_{{max}}$): ({y_min_prediction*.1:.1f}, {y_max_prediction*.1:.1f}) cm",
                  va='top', ha ='left', fontsize=9, bbox=box_prediction)
     axe.grid(True)
     axe.legend()
@@ -145,7 +201,7 @@ def kalman_function():
     axe = axes[2]
     axe.set_title("Z's position comparison between measurement and prediction")
     axe.plot(Time, Z, '.:b', markersize=marker_size, linewidth=0.3, label="Measurements")
-    axe.plot(Time, predictions_z[:,0], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
+    axe.plot(Time, kf.xhat[:,2], '.-r', markersize=marker_size, linewidth=0.3, label = 'Kalman Filter Prediction')
     axe.set_ylabel("distance [mm]")
     axe.set_xlabel(x_label)
     axe.set_ylim(0, ymax_height)
@@ -159,8 +215,8 @@ def kalman_function():
         print(text2_measurement)
         box_measurement = {'facecolor': (.8,.8,.9,.5) , 'edgecolor':'blue', 'boxstyle': 'square'}
 
-        z_mean_prediction, z_std_prediction = predictions_z[:,0].mean(), predictions_z[:,0].std()
-        z_min_prediction, z_max_prediction = predictions_z[:,0].min(), predictions_z[:,0].max()
+        z_mean_prediction, z_std_prediction = kf.xhat[:,2].mean(), kf.xhat[:,2].std()
+        z_min_prediction, z_max_prediction = kf.xhat[:,2].min(), kf.xhat[:,2].max()
         text1_prediction = f"z_mean_prediction: {z_mean_prediction*.1:.1f} cm, z_std_prediction: {z_std_prediction*.1:.1f} cm"
         text1_prediction += f"(min, max): ({z_min_prediction*.1:.1f}, {z_max_prediction*.1:.1f}) cm"
         print(text1_prediction)
@@ -177,7 +233,7 @@ def kalman_function():
     axe.grid(True)
     axe.legend()
     print("--- %s seconds ---" % (time.time() - start_time))
-    plt.savefig(data_file.replace('.txt','.png'))
+    plt.savefig(data_file.replace('.txt','.png'), dpi=160)
     plt.show()
 
 if __name__ == '__main__':

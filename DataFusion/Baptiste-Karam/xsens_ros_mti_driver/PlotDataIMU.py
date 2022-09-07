@@ -85,7 +85,7 @@ class Plot_IMU(object):
         dt, dt_mean, dt_std = dt_array[0]*1e3, dt_array.mean()*1e3, dt_array.std()*1e3
 
         fig, axes = plt.subplots(3,1)
-        plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
+        plt.subplots_adjust(left=0.09, right=0.95, hspace=0.42, wspace=0.21, top=0.9, bottom=0.07)
         fig.set_size_inches((11,9))
         fig.suptitle(f"Plot data from file <{self.data_file}>", fontsize=16)
         marker_size = 1.5 if len(Z) <= 30 else 1
@@ -109,7 +109,7 @@ class Plot_IMU(object):
             axe.text(0, -ymax*.94,
                      fr"mean$_x$: {x_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_x$: {x_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(x$_{{min}}$, $x_{{max}}$): ({x_min:.1f}, {x_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='bottom', ha ='left', fontsize=18, bbox=box)
+                     va='bottom', ha ='left', fontsize=15, bbox=box)
         axe.legend()
         axe.grid(True)
 
@@ -131,7 +131,7 @@ class Plot_IMU(object):
             axe.text(0, ymax*.94,
                      fr"mean$_y$: {y_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_y$: {y_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(y$_{{min}}$, $y_{{max}}$): ({y_min:.1f}, {y_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='top', ha ='left', fontsize=18, bbox=box)
+                     va='top', ha ='left', fontsize=15, bbox=box)
         axe.legend()
         axe.grid(True)
 
@@ -153,11 +153,11 @@ class Plot_IMU(object):
             axe.text(0, ymax*.94,
                      fr"mean$_z$: {z_mean:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, $\sigma_z$: {z_std:.1f} {Plot_IMU.TYPE_INFO[self.type_info][4]}, " +
                      fr"(z$_{{min}}$, $z_{{max}}$): ({z_min:.1f}, {z_max:.1f}) {Plot_IMU.TYPE_INFO[self.type_info][4]}"+ "\n" + text2,
-                     va='top', ha ='left', fontsize=18, bbox=box)
+                     va='top', ha ='left', fontsize=15, bbox=box)
         axe.legend()
         axe.grid(True)
         #
-        plt.savefig(self.data_file.replace('.txt','.png'))
+        plt.savefig(self.data_file.replace('.txt','.png'), dpi=160)
         plt.show()
 
 

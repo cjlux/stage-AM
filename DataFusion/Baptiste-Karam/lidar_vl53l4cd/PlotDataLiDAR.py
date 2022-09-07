@@ -67,7 +67,7 @@ if __name__ == '__main__':
         x_label = "Time [s]"
 
     fig = plt.figure()
-    #plt.subplots_adjust(left=0.07, right=0.9, hspace=0.35, top=0.9, bottom=0.065)
+    plt.subplots_adjust(left=0.10, right=0.95, hspace=0.20, wspace=0.20, top=0.89, bottom=0.08)
     fig.set_size_inches((8,6))
     fig.suptitle(f"Data from <{os.path.basename(data_file)}>", fontsize=14)
     axe = plt.subplot(111)
@@ -91,9 +91,9 @@ if __name__ == '__main__':
         axe.text(0, ymax*.06,
                  fr"mean$_z$: {z_mean*.1:.1f} cm, $\sigma_z$: {z_std*.1:.1f} cm, " +
                  fr"(z$_{{min}}$, $z_{{max}}$): ({z_min*.1:.1f}, {z_max*.1:.1f}) cm"+ "\n" + text2,
-                 va='bottom', ha ='left', fontsize=20, bbox=box)
+                 va='bottom', ha ='left', fontsize=13, bbox=box)
     axe.grid(True)
     axe.legend()
     #
-    plt.savefig(data_file.replace('.txt','.png'))
+    plt.savefig(data_file.replace('.txt','.png'), dpi=160)
     plt.show()

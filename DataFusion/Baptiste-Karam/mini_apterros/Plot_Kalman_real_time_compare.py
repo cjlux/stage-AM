@@ -193,5 +193,5 @@ if __name__ == '__main__':
     axe.grid(True)
     axe.legend()
 
-    plt.savefig(data_file.replace('.txt','.png'))
+    plt.savefig(data_file.replace('.txt','.png'), dpi=160)
     plt.show()

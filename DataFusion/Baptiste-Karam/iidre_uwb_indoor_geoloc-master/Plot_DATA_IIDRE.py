@@ -178,5 +178,5 @@ if TRAJ:
     axe.grid(True)
 
 #
-plt.savefig(image_file+'.png')
+plt.savefig(image_file+'.png', dpi=160)
 plt.show()
