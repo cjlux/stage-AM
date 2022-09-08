@@ -8,7 +8,7 @@ import numpy as np
 import rospy, message_filters, quaternion, time, sys, argparse
 
 class miniapterros_listener:
-    ''' 
+    '''
     This class allows to get the information published by the publishers of IIDRE, LiDAR and MTi-30
     and stores those data in a file Data_fusion_{year}_{month}_{day}_{hour}_{minutes}_{seconds}.txt
     registered in the tree where the code is executed.
@@ -29,8 +29,8 @@ class miniapterros_listener:
               a list of multiple subscribers,
               queue size : sets of messages should be stored from each input filter
                            (by timestamp) while waiting for all messages to arrive,
-              slop : delay in secondes with which messages can be synchronized, 
-              allow_headerless : allow the access to different headers in order 
+              slop : delay in secondes with which messages can be synchronized,
+              allow_headerless : allow the access to different headers in order
                                  to have the TimeStamped for each sensor.
         '''
         self.verbose = verbose
@@ -40,16 +40,16 @@ class miniapterros_listener:
         self.subscriber_lidar = message_filters.Subscriber("/lidar_height", String)
         self.subscriber_mti = message_filters.Subscriber("/filter/quaternion", QuaternionStamped)
         print("instance of MiniApterros created ...")
-        
 
-        self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre, 
-                                                                self.subscriber_lidar, 
+
+        self.tss = message_filters.ApproximateTimeSynchronizer([self.subscriber_iidre,
+                                                                self.subscriber_lidar,
                                                                 self.subscriber_mti],
-                                                                queue_size = 10, 
-                                                                slop = 1, 
+                                                                queue_size = 10,
+                                                                slop = 1,
                                                                 allow_headerless=True)
-        
-        
+
+
         self.tss.registerCallback(self.callback)
 
 
@@ -68,25 +68,25 @@ class miniapterros_listener:
              New_treated_coordinates (using quaternion)
              New_treated_coordinates (using angles of Euler)
         '''
-        
+
         if self.log_file.closed == False:
                 self.parsing_iidre(data_iidre)
                 self.parsing_mti(data_mti)
                 self.parsing_lidar(data_lidar)
 
                 if self.verbose:
-                    rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s", 
-                                                          str(data_iidre.data), 
-                                                          str(data_lidar.data), 
+                    rospy.loginfo(rospy.get_caller_id() + "I heard %s, %s, %s",
+                                                          str(data_iidre.data),
+                                                          str(data_lidar.data),
                                                           str(data_mti.quaternion))
-                
+
                 # Fusion of LiDAR and IMU data
 
                 # Quaternion
                 vector_u = np.quaternion(0.0, 0.0, 0.0, float(data_lidar.data[1]))
-                quaternion = np.quaternion(float(data_mti.quaternion[3]), 
-                                           float(data_mti.quaternion[0]), 
-                                           float(data_mti.quaternion[1]), 
+                quaternion = np.quaternion(float(data_mti.quaternion[3]),
+                                           float(data_mti.quaternion[0]),
+                                           float(data_mti.quaternion[1]),
                                            float(data_mti.quaternion[2]))
                 vector_v = quaternion.conjugate()*vector_u*quaternion
                 height_quaternion = vector_v.z    # Retrieve the last component of the quaternion
@@ -99,7 +99,7 @@ class miniapterros_listener:
                 roll = abs(data_mti_euler[0])
                 pitch = abs(data_mti_euler[1])
                 yaw = abs(data_mti_euler[2])
-                
+
                 matrix_xyz = np.matrix([[0], [0], [data_lidar.data[1]]])
 
                 matrix_roll = [[1, 0, 0],[0, cos(roll), -sin(roll)],[0, sin(roll), cos(roll)]]
@@ -109,7 +109,7 @@ class miniapterros_listener:
                 matrix_euler = np.dot(matrix_yaw, matrix_pitch)
                 matrix_euler = np.dot(matrix_euler, matrix_roll)
                 matrix_new = np.dot(matrix_euler, matrix_xyz)
-                
+
                 # Writing in file
 
                 self.log_file.write("Time-IIDRE: "+str(data_iidre.data[0])+"\n")
@@ -125,7 +125,7 @@ class miniapterros_listener:
                                                            str(data_mti_euler[1])+","+
                                                            str(data_mti_euler[2])+"\n")
                 self.log_file.write("DATA_LiDAR:"+ str(data_lidar.data[1])+"\n")
-        
+
                 self.log_file.write("Nouvelles coordonnées - quaternion:"+str(data_iidre.data[1])+","+
                                                                           str(data_iidre.data[2])+","+
                                                                           str(abs(height_quaternion))+"\n")
@@ -136,7 +136,7 @@ class miniapterros_listener:
                 return
 
     def parsing_iidre(self, data_iidre):
-        ''' 
+        '''
         This enables to only take the relevant information of the message it hears.
         So, it splits the information at each ':' to first see if the information is about
         the distance between each anchor and the tag or the position of the tag.
@@ -151,7 +151,7 @@ class miniapterros_listener:
         data_iidre.data = [Time, fb_data[1], fb_data[2]]
 
     def parsing_lidar(self, data_lidar):
-        ''' 
+        '''
         Splits data at each ',' and takes the second part of data
         which corresponds to the distance measured by LiDAR
         '''
@@ -160,7 +160,7 @@ class miniapterros_listener:
         data_lidar.data = [fb[0], int(float(data_lidar.data))]
 
     def parsing_mti(self, data_mti):
-        ''' 
+        '''
         Receives data as argument: splits data to get only time and the quaternions.
         '''
         # concatenate all the lines:

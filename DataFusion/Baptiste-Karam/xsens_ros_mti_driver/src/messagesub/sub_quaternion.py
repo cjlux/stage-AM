@@ -6,7 +6,7 @@ from scipy.spatial.transform import Rotation
 from std_msgs.msg import String
 import rospy, time, sys, argparse
 
-class xsens_mti_listener:
+class xsens_mti_listener_quaternion:
     '''
        This class registers what come from a specified topic.
        It displays the Euler angle Roll, Pitch, Yaw
@@ -77,14 +77,14 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        listener = xsens_mti_listener(f)
+        listener = xsens_mti_listener_quaternion(f)
 
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The
         # anonymous=True flag means that rospy will choose a unique
         # name for our 'listener' node so that multiple listeners can
         # run simultaneously.
-        rospy.init_node('xsens_mti_listener', anonymous = True)
+        rospy.init_node('xsens_mti_listener_quaternion', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
         if duration:

@@ -4,7 +4,7 @@ from geometry_msgs.msg import Vector3Stamped
 from std_msgs.msg import String
 import rospy, time, sys, argparse
 
-class xsens_mti_listener:
+class xsens_mti_listener_angular_velocity:
     '''
        This class registers what come from a specified topic.
        It displays the 3 components of angular velocity
@@ -30,8 +30,8 @@ class xsens_mti_listener:
 	    Then it displays the 3 components of angular velocity when verbose=True
 	    Parameters:
 	    Data: data received
-	'''	
-	
+	'''
+
         if self.log_file.closed == False:
 		self.parsing(data)
 		if self.verbose: rospy.loginfo(rospy.get_caller_id() + "I heard %s", str(data.vector))
@@ -70,14 +70,14 @@ if __name__ == '__main__':
 
    with open(uniq_file_name, "w") as f:
 
-        listener = xsens_mti_listener(f)
+        listener = xsens_mti_listener_angular_velocity(f)
 
         # In ROS, nodes are uniquely named. If two nodes with the same
         # name are launched, the previous one is kicked off. The
         # anonymous=True flag means that rospy will choose a unique
         # name for our 'listener' node so that multiple listeners can
         # run simultaneously.
-        rospy.init_node('xsens_mti_listener', anonymous = True)
+        rospy.init_node('xsens_mti_listener_angular_velocity', anonymous = True)
 
         # spin() simply keeps python from exiting until this node is stopped
         if duration:
