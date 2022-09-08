@@ -65,8 +65,6 @@ class UwbXyzPublisher(object):
                 else :
                         line = self.serial.readline().decode("ascii")
 
-                print(line)
-
                 line = line.strip()          # remove \n or \t or \r at begin or end of the str
                 line = line.replace(' ','0') # we use 2D configutaion: z value is a space
 

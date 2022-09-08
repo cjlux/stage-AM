@@ -105,7 +105,7 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-catkin_install_python(PROGRAMS src/publisher.py src/subscriber.py
+catkin_install_python(PROGRAMS src/pub_iidre.py src/sub_iidre.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
