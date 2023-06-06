@@ -25,12 +25,11 @@ const int nbStepPerRevol  = int(360./stepAngle_deg);                // number of
 
 int dir = 1;             // stepper rotation direction
 bool done = false;
-bool singleShot = false; // to choose singleshot or continuous mode
+bool singleShot = false; // to choose singleshot or continuous mode for the motor
 
 // macros usefull to write on digital pins:
 #define CLR(x,y) (x &= (~(1 << y)))
 #define SET(x,y) (x |= (1 << y))
-
 
 void makeStepperTurn(int dir, 
                      float angle, 
@@ -93,7 +92,7 @@ void setup()
   digitalWrite(pinEnable, HIGH); // disable torque
 }
 
-float speedRPS = 2.;   // motor speed (Revolution Per Second)
+float speedRPS = 1;   // motor speed (Revolution Per Second)
 
 void loop()
 {
@@ -113,7 +112,7 @@ void loop()
   {
     Serial.print("\nSpeedRPS [RPS]: "); Serial.println(speedRPS);
     // if singleshot is not true, run makeStepperTurn every loop turn
-    makeStepperTurn(dir, 50*360., stepAngle_deg, speedRPS, true);
+    makeStepperTurn(dir, 10*360., stepAngle_deg, speedRPS, true);
     delay(1000);
   }
 }
